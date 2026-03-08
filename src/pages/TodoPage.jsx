@@ -150,6 +150,7 @@ const TodoPage = () => {
         </div>
       )}
     </div>
+    </PageTransition>
   );
 };
 

@@ -29,7 +29,8 @@ const StudyRooms = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-3xl mx-auto space-y-6">
+    <PageTransition>
+    <div className="min-h-screen p-4 md:p-8 pt-20 max-w-3xl mx-auto space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-display font-extrabold text-foreground">🏠 Study Rooms</h1>
         <p className="text-muted-foreground text-sm mt-1">Create or join a room to study with friends</p>
