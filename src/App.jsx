@@ -20,7 +20,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Navbar />
-        <div className="pt-0 md:pt-14 pb-20 md:pb-0">
+        <div className="pt-0 md:pt-16 pb-20 md:pb-0">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/profile" element={<ProfilePage />} />

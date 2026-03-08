@@ -3,14 +3,14 @@ import { useState } from "react";
 import { generateWeeklyData, generateMonthlyData, generateYearlyData } from "@/lib/mockData";
 
 const CHART_COLORS = [
-  "hsl(160, 100%, 45%)",
-  "hsl(190, 100%, 50%)",
-  "hsl(270, 100%, 65%)",
-  "hsl(25, 100%, 55%)",
+  "hsl(220, 80%, 55%)",
+  "hsl(160, 60%, 45%)",
+  "hsl(260, 60%, 55%)",
+  "hsl(25, 90%, 55%)",
 ];
 
 const ProductivityCharts = () => {
-  const [period, setPeriod] = useState<"weekly" | "monthly" | "yearly">("weekly");
+  const [period, setPeriod] = useState("weekly");
 
   const dataMap = {
     weekly: generateWeeklyData(),
@@ -30,11 +30,11 @@ const ProductivityCharts = () => {
   ];
 
   return (
-    <div className="glass rounded-xl p-5">
+    <div className="glass rounded-xl p-5 soft-shadow">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-display text-sm font-semibold">📊 Productivity</h3>
         <div className="flex gap-1 bg-secondary rounded-lg p-1">
-          {(["weekly", "monthly", "yearly"] as const).map((p) => (
+          {["weekly", "monthly", "yearly"].map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
@@ -49,12 +49,12 @@ const ProductivityCharts = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-secondary rounded-lg p-3 text-center">
+        <div className="bg-primary/5 rounded-lg p-3 text-center border border-primary/10">
           <p className="text-2xl font-display font-bold text-primary">{totalHours.toFixed(1)}</p>
           <p className="text-xs text-muted-foreground">Total Hours</p>
         </div>
-        <div className="bg-secondary rounded-lg p-3 text-center">
-          <p className="text-2xl font-display font-bold text-neon-cyan">{totalTasks}</p>
+        <div className="bg-accent/5 rounded-lg p-3 text-center border border-accent/10">
+          <p className="text-2xl font-display font-bold text-accent">{totalTasks}</p>
           <p className="text-xs text-muted-foreground">Tasks Done</p>
         </div>
       </div>
@@ -64,22 +64,22 @@ const ProductivityCharts = () => {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(160, 100%, 45%)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(160, 100%, 45%)" stopOpacity={0} />
+                <stop offset="5%" stopColor="hsl(220, 80%, 55%)" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="hsl(220, 80%, 55%)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(230, 15%, 18%)" />
-            <XAxis dataKey="name" stroke="hsl(215, 15%, 55%)" fontSize={12} />
-            <YAxis stroke="hsl(215, 15%, 55%)" fontSize={12} />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 90%)" />
+            <XAxis dataKey="name" stroke="hsl(220, 10%, 50%)" fontSize={12} />
+            <YAxis stroke="hsl(220, 10%, 50%)" fontSize={12} />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(230, 20%, 10%)",
-                border: "1px solid hsl(230, 15%, 18%)",
+                backgroundColor: "hsl(0, 0%, 100%)",
+                border: "1px solid hsl(220, 15%, 90%)",
                 borderRadius: "8px",
-                color: "hsl(210, 40%, 93%)",
+                color: "hsl(220, 20%, 15%)",
               }}
             />
-            <Area type="monotone" dataKey="hours" stroke="hsl(160, 100%, 45%)" fill="url(#colorHours)" strokeWidth={2} />
+            <Area type="monotone" dataKey="hours" stroke="hsl(220, 80%, 55%)" fill="url(#colorHours)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -103,10 +103,10 @@ const ProductivityCharts = () => {
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(230, 20%, 10%)",
-                border: "1px solid hsl(230, 15%, 18%)",
+                backgroundColor: "hsl(0, 0%, 100%)",
+                border: "1px solid hsl(220, 15%, 90%)",
                 borderRadius: "8px",
-                color: "hsl(210, 40%, 93%)",
+                color: "hsl(220, 20%, 15%)",
               }}
             />
           </PieChart>

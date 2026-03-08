@@ -1,12 +1,6 @@
 import { getRank, getRankProgress, getNextRank, RANK_ICONS } from "@/lib/ranks";
 
-interface RankBadgeProps {
-  hours: number;
-  showProgress?: boolean;
-  size?: "sm" | "md" | "lg";
-}
-
-const RankBadge = ({ hours, showProgress = true, size = "md" }: RankBadgeProps) => {
+const RankBadge = ({ hours, showProgress = true, size = "md" }) => {
   const rank = getRank(hours);
   const progress = getRankProgress(hours);
   const nextRank = getNextRank(hours);
@@ -21,14 +15,10 @@ const RankBadge = ({ hours, showProgress = true, size = "md" }: RankBadgeProps) 
   return (
     <div className="flex flex-col items-center gap-2">
       <div
-        className={`glass rounded-xl flex items-center gap-2 font-display font-bold tracking-wider ${sizeClasses[size]}`}
-        style={{
-          borderColor: `var(--${rank.color})`,
-          boxShadow: `0 0 15px hsl(var(--${rank.color}) / 0.3)`,
-        }}
+        className={`glass rounded-xl flex items-center gap-2 font-display font-bold tracking-wider soft-shadow ${sizeClasses[size]}`}
       >
         <span className="text-2xl">{icon}</span>
-        <span className={`text-${rank.color}`}>{rank.name}</span>
+        <span className="text-foreground">{rank.name}</span>
       </div>
       {showProgress && nextRank && (
         <div className="w-full max-w-[200px]">

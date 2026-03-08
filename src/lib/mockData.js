@@ -1,26 +1,11 @@
 import { getStreakLevel } from "./ranks";
 
-export interface UserProfile {
-  name: string;
-  email: string;
-  avatar: string;
-  contactNo: string;
-  aboutMe: string;
-  totalStudyHours: number;
-  points: number;
-  currentStreak: number;
-  maxStreak: number;
-  countryRank: number;
-  friendRank: number;
-  friendsCount: number;
-}
-
-export const mockUser: UserProfile = {
-  name: "PixelNinja",
-  email: "pixelninja@study.gg",
+export const mockUser = {
+  name: "Alex Johnson",
+  email: "alex@productivity.io",
   avatar: "",
   contactNo: "+1 234 567 8900",
-  aboutMe: "Grinding DSA & System Design 🚀 | Competitive programmer | Night owl coder 🦉",
+  aboutMe: "Grinding DSA & System Design 🚀 | Competitive programmer | Building cool stuff every day",
   totalStudyHours: 342,
   points: 15420,
   currentStreak: 23,
@@ -30,15 +15,13 @@ export const mockUser: UserProfile = {
   friendsCount: 18,
 };
 
-// Generate streak data for last 365 days
-export function generateStreakData(): { date: string; percentage: number; level: number }[] {
+export function generateStreakData() {
   const data = [];
   const today = new Date();
   for (let i = 364; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
     const dayOfWeek = date.getDay();
-    // Simulate realistic study patterns
     let percentage = 0;
     if (Math.random() > 0.25) {
       if (dayOfWeek === 0 || dayOfWeek === 6) {
@@ -82,15 +65,7 @@ export function generateYearlyData() {
   ];
 }
 
-export interface TodoTask {
-  id: string;
-  title: string;
-  description: string;
-  percentage: number;
-  createdAt: string;
-}
-
-export const mockTodos: TodoTask[] = [
+export const mockTodos = [
   { id: "1", title: "Binary Trees - Chapter 5", description: "Complete all practice problems", percentage: 75, createdAt: new Date().toISOString() },
   { id: "2", title: "System Design - Load Balancer", description: "Watch video + notes", percentage: 40, createdAt: new Date().toISOString() },
   { id: "3", title: "React Hooks Deep Dive", description: "useEffect, useMemo, useCallback", percentage: 100, createdAt: new Date().toISOString() },

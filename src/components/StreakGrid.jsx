@@ -1,11 +1,6 @@
-interface StreakGridProps {
-  data: { date: string; percentage: number; level: number }[];
-}
-
-const StreakGrid = ({ data }: StreakGridProps) => {
-  // Group data into weeks (columns)
-  const weeks: typeof data[] = [];
-  let currentWeek: typeof data = [];
+const StreakGrid = ({ data }) => {
+  const weeks = [];
+  let currentWeek = [];
 
   data.forEach((day, i) => {
     currentWeek.push(day);
@@ -23,10 +18,8 @@ const StreakGrid = ({ data }: StreakGridProps) => {
     "bg-streak-4",
   ];
 
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
   return (
-    <div className="glass rounded-xl p-4 overflow-x-auto">
+    <div className="glass rounded-xl p-4 overflow-x-auto soft-shadow">
       <h3 className="font-display text-sm font-semibold text-foreground mb-3">
         📅 Study Streak
       </h3>

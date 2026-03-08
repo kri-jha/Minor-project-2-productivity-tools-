@@ -1,13 +1,4 @@
-export interface RankInfo {
-  name: string;
-  tier: string;
-  division: string;
-  minHours: number;
-  maxHours: number;
-  color: string;
-}
-
-export const RANKS: RankInfo[] = [
+export const RANKS = [
   { name: "Bronze V", tier: "Bronze", division: "V", minHours: 0, maxHours: 10, color: "rank-bronze" },
   { name: "Bronze IV", tier: "Bronze", division: "IV", minHours: 10, maxHours: 20, color: "rank-bronze" },
   { name: "Bronze III", tier: "Bronze", division: "III", minHours: 20, maxHours: 30, color: "rank-bronze" },
@@ -43,27 +34,27 @@ export const RANKS: RankInfo[] = [
   { name: "Conqueror", tier: "Conqueror", division: "", minHours: 2200, maxHours: Infinity, color: "rank-conqueror" },
 ];
 
-export function getRank(hours: number): RankInfo {
+export function getRank(hours) {
   for (let i = RANKS.length - 1; i >= 0; i--) {
     if (hours >= RANKS[i].minHours) return RANKS[i];
   }
   return RANKS[0];
 }
 
-export function getRankProgress(hours: number): number {
+export function getRankProgress(hours) {
   const rank = getRank(hours);
   if (rank.maxHours === Infinity) return 100;
   const range = rank.maxHours - rank.minHours;
   return Math.min(100, ((hours - rank.minHours) / range) * 100);
 }
 
-export function getNextRank(hours: number): RankInfo | null {
+export function getNextRank(hours) {
   const current = getRank(hours);
   const idx = RANKS.indexOf(current);
   return idx < RANKS.length - 1 ? RANKS[idx + 1] : null;
 }
 
-export function getStreakLevel(percentage: number): number {
+export function getStreakLevel(percentage) {
   if (percentage === 0) return 0;
   if (percentage <= 25) return 1;
   if (percentage <= 50) return 2;
@@ -71,7 +62,7 @@ export function getStreakLevel(percentage: number): number {
   return 4;
 }
 
-export const RANK_ICONS: Record<string, string> = {
+export const RANK_ICONS = {
   Bronze: "🥉",
   Silver: "🥈",
   Gold: "🥇",
