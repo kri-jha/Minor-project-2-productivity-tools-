@@ -1,174 +1,199 @@
-import { useState } from "react";
-import { Plus, Users, Lock, Unlock, Copy, Trash2, DoorOpen, Radio, Wifi, Crown, Sparkles, Search, Volume2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Users, Lock, Unlock, Copy, Trash2, DoorOpen, Radio, Wifi, Sparkles, Search, Volume2, Headphones, Timer, MessageCircle, Mic, MicOff, Crown } from "lucide-react";
 import PageTransition from "@/components/PageTransition";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-const ROOM_THEMES = [
-  { emoji: "🔥", bg: "from-orange-500/8 to-amber-500/5", border: "border-orange-300/20", dot: "bg-orange-400" },
-  { emoji: "💎", bg: "from-blue-500/8 to-cyan-500/5", border: "border-blue-300/20", dot: "bg-blue-400" },
-  { emoji: "🎯", bg: "from-emerald-500/8 to-green-500/5", border: "border-emerald-300/20", dot: "bg-emerald-400" },
-  { emoji: "⚡", bg: "from-violet-500/8 to-purple-500/5", border: "border-violet-300/20", dot: "bg-violet-400" },
-  { emoji: "🚀", bg: "from-pink-500/8 to-rose-500/5", border: "border-pink-300/20", dot: "bg-pink-400" },
-  { emoji: "🧠", bg: "from-cyan-500/8 to-teal-500/5", border: "border-cyan-300/20", dot: "bg-cyan-400" },
+const ROOM_VIBES = [
+  { tag: "🔥 Intense", bg: "from-orange-500/10 via-amber-500/5 to-transparent", border: "border-orange-400/20", glow: "hover:shadow-[0_0_30px_rgba(249,115,22,0.08)]", accent: "text-orange-500", accentBg: "bg-orange-500/10", stripe: "from-orange-500/40 via-amber-400/20 to-transparent" },
+  { tag: "💎 Focus", bg: "from-blue-500/10 via-sky-500/5 to-transparent", border: "border-blue-400/20", glow: "hover:shadow-[0_0_30px_rgba(59,130,246,0.08)]", accent: "text-blue-500", accentBg: "bg-blue-500/10", stripe: "from-blue-500/40 via-sky-400/20 to-transparent" },
+  { tag: "🌿 Chill", bg: "from-emerald-500/10 via-green-500/5 to-transparent", border: "border-emerald-400/20", glow: "hover:shadow-[0_0_30px_rgba(16,185,129,0.08)]", accent: "text-emerald-500", accentBg: "bg-emerald-500/10", stripe: "from-emerald-500/40 via-green-400/20 to-transparent" },
+  { tag: "⚡ Grind", bg: "from-violet-500/10 via-purple-500/5 to-transparent", border: "border-violet-400/20", glow: "hover:shadow-[0_0_30px_rgba(139,92,246,0.08)]", accent: "text-violet-500", accentBg: "bg-violet-500/10", stripe: "from-violet-500/40 via-purple-400/20 to-transparent" },
+  { tag: "🚀 Sprint", bg: "from-pink-500/10 via-rose-500/5 to-transparent", border: "border-pink-400/20", glow: "hover:shadow-[0_0_30px_rgba(236,72,153,0.08)]", accent: "text-pink-500", accentBg: "bg-pink-500/10", stripe: "from-pink-500/40 via-rose-400/20 to-transparent" },
+  { tag: "🧠 Deep", bg: "from-cyan-500/10 via-teal-500/5 to-transparent", border: "border-cyan-400/20", glow: "hover:shadow-[0_0_30px_rgba(6,182,212,0.08)]", accent: "text-cyan-500", accentBg: "bg-cyan-500/10", stripe: "from-cyan-500/40 via-teal-400/20 to-transparent" },
 ];
 
-const getTheme = (id) => ROOM_THEMES[parseInt(id, 10) % ROOM_THEMES.length] || ROOM_THEMES[0];
+const getVibe = (id) => ROOM_VIBES[parseInt(id, 10) % ROOM_VIBES.length] || ROOM_VIBES[0];
 
 const INITIAL_ROOMS = [
   { id: "1", name: "DSA Grinders", code: "DSA-420", isPrivate: false, members: [
     { name: "Alex", status: "studying", avatar: "🧑‍💻" },
     { name: "CodeWiz", status: "idle", avatar: "🧙" },
     { name: "ByteMe", status: "studying", avatar: "🤖" },
-  ], maxMembers: 10, topic: "Binary Trees & Graphs" },
+  ], maxMembers: 10, topic: "Binary Trees & Graphs", timer: "01:23:45" },
   { id: "2", name: "System Design Gang", code: "SYS-069", isPrivate: true, members: [
     { name: "Alex", status: "studying", avatar: "🧑‍💻" },
     { name: "ArchMaster", status: "studying", avatar: "🏗️" },
-  ], maxMembers: 5, topic: "Load Balancers" },
+  ], maxMembers: 5, topic: "Load Balancers", timer: "00:45:12" },
   { id: "3", name: "Frontend Wizards", code: "FRN-777", isPrivate: false, members: [
     { name: "ReactFan", status: "studying", avatar: "⚛️" },
     { name: "CSSKing", status: "idle", avatar: "🎨" },
     { name: "TypeHero", status: "studying", avatar: "📘" },
     { name: "NodeNinja", status: "studying", avatar: "🥷" },
-  ], maxMembers: 8, topic: "React Performance" },
+  ], maxMembers: 8, topic: "React Performance", timer: "02:10:33" },
   { id: "4", name: "Late Night Coders", code: "LNC-042", isPrivate: false, members: [
     { name: "NightOwl", status: "studying", avatar: "🦉" },
-  ], maxMembers: 6, topic: "LeetCode Dailies" },
+  ], maxMembers: 6, topic: "LeetCode Dailies", timer: "00:15:08" },
 ];
 
-const MemberAvatar = ({ member, index }) => (
+const PulsingDot = ({ color = "bg-emerald-400", size = "w-2 h-2" }) => (
+  <span className="relative flex">
+    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${color} opacity-40`} />
+    <span className={`relative inline-flex rounded-full ${size} ${color}`} />
+  </span>
+);
+
+const MemberAvatar = ({ member, index, isHost }) => (
   <motion.div
-    initial={{ scale: 0, x: -5 }}
-    animate={{ scale: 1, x: 0 }}
-    transition={{ delay: index * 0.05, type: "spring" }}
-    className="relative group/avatar"
+    initial={{ scale: 0, y: 5 }}
+    animate={{ scale: 1, y: 0 }}
+    transition={{ delay: 0.05 + index * 0.04, type: "spring", stiffness: 300 }}
+    className="relative group/av"
   >
-    <div className={`w-8 h-8 rounded-full bg-secondary border-2 border-background flex items-center justify-center text-sm ${
-      index > 0 ? "-ml-2" : ""
-    }`}>
+    <div className={`w-9 h-9 rounded-full bg-secondary/80 border-[2.5px] border-background flex items-center justify-center text-sm shadow-sm ${
+      index > 0 ? "-ml-2.5" : ""
+    } ${member.status === "studying" ? "ring-2 ring-emerald-400/30" : ""}`}>
       {member.avatar}
     </div>
-    {member.status === "studying" && (
-      <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-background" />
+    {isHost && index === 0 && (
+      <Crown className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 text-amber-400 drop-shadow-sm" />
     )}
-    {/* Tooltip */}
-    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-[9px] font-bold px-2 py-0.5 rounded-md opacity-0 group-hover/avatar:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+    {member.status === "studying" && (
+      <span className="absolute -bottom-0.5 -right-0.5">
+        <PulsingDot size="w-2.5 h-2.5" />
+      </span>
+    )}
+    <div className="absolute -top-9 left-1/2 -translate-x-1/2 bg-foreground/95 backdrop-blur-sm text-background text-[9px] font-bold px-2.5 py-1 rounded-lg opacity-0 group-hover/av:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20 shadow-lg">
       {member.name}
+      <span className="text-background/50 ml-1">{member.status === "studying" ? "• studying" : "• idle"}</span>
+      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground/95 rotate-45" />
     </div>
   </motion.div>
 );
 
-const RoomCard = ({ room, theme, onCopy, onDelete, onJoin }) => {
+const RoomCard = ({ room, vibe, onCopy, onDelete, onJoin, index }) => {
   const studyingCount = room.members.filter((m) => m.status === "studying").length;
   const isFull = room.members.length >= room.maxMembers;
+  const fillPercent = (room.members.length / room.maxMembers) * 100;
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 25, scale: 0.94 }}
+      initial={{ opacity: 0, y: 30, scale: 0.92 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9, x: -30, filter: "blur(4px)" }}
-      transition={{ type: "spring", stiffness: 200, damping: 20 }}
-      className={`relative rounded-2xl border ${theme.border} overflow-hidden group hover:shadow-lg hover:shadow-primary/5 transition-shadow duration-300`}
+      exit={{ opacity: 0, scale: 0.85, x: -50, filter: "blur(6px)" }}
+      transition={{ type: "spring", stiffness: 180, damping: 20, delay: index * 0.04 }}
+      className={`relative rounded-[20px] border ${vibe.border} overflow-hidden group ${vibe.glow} transition-all duration-300`}
     >
-      {/* Top stripe */}
-      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${theme.bg.replace('/8', '/40').replace('/5', '/20')}`} />
+      {/* Top gradient stripe */}
+      <div className={`absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r ${vibe.stripe}`} />
 
-      <div className={`relative bg-gradient-to-br ${theme.bg} backdrop-blur-sm p-5`}>
-        {/* Watermark */}
-        <div className="absolute top-4 right-5 text-4xl opacity-[0.06] pointer-events-none select-none">
-          {theme.emoji}
-        </div>
+      <div className={`relative bg-gradient-to-br ${vibe.bg} p-5 md:p-6`}>
+        {/* Decorative orbs */}
+        <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full ${vibe.accentBg} opacity-30 blur-3xl pointer-events-none`} />
+        <div className={`absolute -bottom-8 -left-8 w-24 h-24 rounded-full ${vibe.accentBg} opacity-20 blur-2xl pointer-events-none`} />
 
-        {/* Header row */}
-        <div className="flex items-start justify-between gap-3 mb-4">
+        {/* Row 1: Name + Topic + Actions */}
+        <div className="flex items-start justify-between gap-3 mb-4 relative z-10">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <h3 className="font-display font-bold text-base text-foreground truncate">{room.name}</h3>
+            <div className="flex items-center gap-2.5 flex-wrap mb-1.5">
+              <h3 className="font-display font-black text-[17px] text-foreground truncate leading-none">{room.name}</h3>
               {room.isPrivate ? (
-                <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider bg-purple-100 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400 px-2 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-[0.15em] bg-purple-100 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400 px-2 py-0.5 rounded-md border border-purple-200/50 dark:border-purple-500/20">
                   <Lock className="w-2.5 h-2.5" /> Private
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 px-2 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-[0.15em] bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-200/50 dark:border-emerald-500/20">
                   <Unlock className="w-2.5 h-2.5" /> Open
                 </span>
               )}
             </div>
-            {room.topic && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Radio className="w-3 h-3 text-primary" />
-                {room.topic}
-              </p>
-            )}
+            <div className="flex items-center gap-3 flex-wrap">
+              {room.topic && (
+                <p className={`text-[11px] font-medium flex items-center gap-1 ${vibe.accent}`}>
+                  <Radio className="w-3 h-3" /> {room.topic}
+                </p>
+              )}
+              {room.timer && (
+                <p className="text-[11px] text-muted-foreground font-mono font-medium flex items-center gap-1">
+                  <Timer className="w-3 h-3" /> {room.timer}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              onClick={() => onCopy(room.code)}
-              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all"
-              title="Copy room code"
-            >
+          <div className="flex items-center gap-1 shrink-0">
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => onCopy(room.code)}
+              className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-secondary/60 transition-all" title="Copy code">
               <Copy className="w-3.5 h-3.5" />
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.92 }}
-              onClick={() => onDelete(room.id)}
-              className="p-2 rounded-xl text-muted-foreground/30 hover:text-destructive hover:bg-destructive/5 opacity-0 group-hover:opacity-100 transition-all"
-            >
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => onDelete(room.id)}
+              className="p-2 rounded-xl text-muted-foreground/20 hover:text-destructive hover:bg-destructive/5 opacity-0 group-hover:opacity-100 transition-all">
               <Trash2 className="w-3.5 h-3.5" />
             </motion.button>
           </div>
         </div>
 
-        {/* Members + Join */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Member avatars */}
-            <div className="flex items-center">
-              {room.members.slice(0, 5).map((m, i) => (
-                <MemberAvatar key={m.name} member={m} index={i} />
+        {/* Row 2: Members + capacity bar + Join */}
+        <div className="flex items-center justify-between gap-4 relative z-10">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {/* Avatars */}
+            <div className="flex items-center shrink-0">
+              {room.members.slice(0, 4).map((m, i) => (
+                <MemberAvatar key={m.name} member={m} index={i} isHost={true} />
               ))}
-              {room.members.length > 5 && (
-                <div className="w-8 h-8 -ml-2 rounded-full bg-secondary border-2 border-background flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                  +{room.members.length - 5}
+              {room.members.length > 4 && (
+                <div className="w-9 h-9 -ml-2.5 rounded-full bg-secondary/80 border-[2.5px] border-background flex items-center justify-center text-[10px] font-black text-muted-foreground shadow-sm">
+                  +{room.members.length - 4}
                 </div>
               )}
             </div>
 
-            {/* Stats */}
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
-                <Users className="w-3 h-3" /> {room.members.length}/{room.maxMembers}
-              </span>
-              <span className="text-[10px] text-emerald-500 font-medium flex items-center gap-1">
-                <Wifi className="w-3 h-3" /> {studyingCount} studying
-              </span>
+            {/* Capacity + studying */}
+            <div className="flex-1 min-w-0 hidden sm:block">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider flex items-center gap-1">
+                  <Users className="w-3 h-3" /> {room.members.length}/{room.maxMembers}
+                </span>
+                <span className="text-[9px] font-bold flex items-center gap-1">
+                  <PulsingDot size="w-1.5 h-1.5" />
+                  <span className="text-emerald-500">{studyingCount} active</span>
+                </span>
+              </div>
+              <div className="h-1.5 rounded-full bg-secondary/60 overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${fillPercent}%` }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className={`h-full rounded-full bg-gradient-to-r ${
+                    fillPercent >= 80 ? "from-red-400 to-orange-400" : fillPercent >= 50 ? "from-amber-400 to-yellow-400" : "from-emerald-400 to-green-400"
+                  }`}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Room code + Join */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-bold text-muted-foreground bg-secondary/80 px-2.5 py-1 rounded-lg border border-border/30">
+          {/* Code + Join */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => onCopy(room.code)}
+              className="text-[10px] font-mono font-bold text-muted-foreground/60 bg-secondary/60 hover:bg-secondary px-2.5 py-1.5 rounded-lg border border-border/20 transition-colors hidden sm:block"
+            >
               {room.code}
-            </span>
+            </button>
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.04, y: -1 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => onJoin(room)}
               disabled={isFull}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-display font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-display font-bold transition-all ${
                 isFull
                   ? "bg-secondary text-muted-foreground cursor-not-allowed"
-                  : "bg-foreground text-background shadow-md hover:shadow-lg"
+                  : "bg-foreground text-background shadow-lg shadow-foreground/10 hover:shadow-xl hover:shadow-foreground/15"
               }`}
             >
               <DoorOpen className="w-3.5 h-3.5" />
-              {isFull ? "Full" : "Join"}
+              {isFull ? "Full" : "Join Room"}
             </motion.button>
           </div>
         </div>
@@ -184,21 +209,13 @@ const StudyRooms = () => {
   const [isPrivate, setIsPrivate] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("all"); // all, public, private
+  const [filterType, setFilterType] = useState("all");
 
   const createRoom = () => {
     if (!newRoomName.trim()) return;
     const code = `${newRoomName.slice(0, 3).toUpperCase()}-${Math.floor(Math.random() * 999)}`;
     setRooms([
-      {
-        id: Date.now().toString(),
-        name: newRoomName,
-        code,
-        isPrivate,
-        members: [{ name: "You", status: "studying", avatar: "🧑‍💻" }],
-        maxMembers: 10,
-        topic: newTopic || null,
-      },
+      { id: Date.now().toString(), name: newRoomName, code, isPrivate, members: [{ name: "You", status: "studying", avatar: "🧑‍💻" }], maxMembers: 10, topic: newTopic || null, timer: "00:00:00" },
       ...rooms,
     ]);
     setNewRoomName("");
@@ -212,10 +229,7 @@ const StudyRooms = () => {
     toast.success("Room code copied!");
   };
 
-  const joinRoom = (room) => {
-    toast.success(`Joined "${room.name}"!`);
-  };
-
+  const joinRoom = (room) => toast.success(`Joined "${room.name}"!`);
   const deleteRoom = (id) => setRooms(rooms.filter((r) => r.id !== id));
 
   const filteredRooms = rooms.filter((r) => {
@@ -225,6 +239,7 @@ const StudyRooms = () => {
   });
 
   const totalStudying = rooms.reduce((s, r) => s + r.members.filter((m) => m.status === "studying").length, 0);
+  const totalMembers = rooms.reduce((s, r) => s + r.members.length, 0);
 
   return (
     <PageTransition>
@@ -233,116 +248,78 @@ const StudyRooms = () => {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: -15 }} animate={{ opacity: 1, y: 0 }} className="flex items-end justify-between">
           <div>
-            <motion.div
-              initial={{ x: -10, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2"
-            >
-              <Volume2 className="w-3.5 h-3.5" />
-              Study Together
+            <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">
+              <Headphones className="w-3.5 h-3.5" /> Study Together
             </motion.div>
-            <h1 className="text-3xl md:text-4xl font-display font-black text-foreground tracking-tight leading-none">
-              Study Rooms
-            </h1>
+            <h1 className="text-3xl md:text-4xl font-display font-black text-foreground tracking-tight leading-none">Study Rooms</h1>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setShowCreate(!showCreate)}
-            className="flex items-center gap-2 bg-foreground text-background px-5 py-2.5 rounded-xl font-display font-bold text-sm shadow-lg"
-          >
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowCreate(!showCreate)}
+            className="flex items-center gap-2 bg-foreground text-background px-5 py-2.5 rounded-xl font-display font-bold text-sm shadow-lg">
             <Plus className="w-4 h-4" /> New Room
           </motion.button>
         </motion.div>
 
-        {/* Live banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="flex items-center gap-3 glass rounded-2xl p-4 soft-shadow"
-        >
-          <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <Wifi className="w-5 h-5 text-emerald-500" />
-            </div>
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-background animate-pulse" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-display font-bold text-foreground">
-              {totalStudying} student{totalStudying !== 1 ? "s" : ""} studying right now
-            </p>
-            <p className="text-[10px] text-muted-foreground">
-              {rooms.length} active room{rooms.length !== 1 ? "s" : ""} • Join one to boost focus
-            </p>
-          </div>
-          <div className="flex -space-x-1.5">
-            {["🧑‍💻", "🧙", "🤖", "⚛️"].map((e, i) => (
-              <motion.div
-                key={i}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2 + i * 0.05 }}
-                className="w-7 h-7 rounded-full bg-secondary border-2 border-background flex items-center justify-center text-xs"
-              >
-                {e}
+        {/* Live Banner */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="glass rounded-2xl soft-shadow overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/[0.03] via-transparent to-primary/[0.03]" />
+          <div className="relative p-4 flex items-center gap-4">
+            <div className="relative shrink-0">
+              <motion.div animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 border border-emerald-400/20 flex items-center justify-center">
+                <Wifi className="w-5 h-5 text-emerald-500" />
               </motion.div>
-            ))}
+              <span className="absolute -top-0.5 -right-0.5"><PulsingDot /></span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-display font-bold text-foreground flex items-center gap-2">
+                <span className="text-emerald-500">{totalStudying}</span> studying now
+                <span className="text-muted-foreground/30">•</span>
+                <span className="text-muted-foreground text-xs font-normal">{totalMembers} online across {rooms.length} rooms</span>
+              </p>
+              <div className="flex items-center gap-2 mt-1.5">
+                {ROOM_VIBES.slice(0, 4).map((v, i) => (
+                  <span key={i} className={`text-[9px] font-bold ${v.accent} ${v.accentBg} px-2 py-0.5 rounded-md`}>{v.tag}</span>
+                ))}
+              </div>
+            </div>
+            <div className="flex -space-x-2 shrink-0">
+              {["🧑‍💻", "🧙", "🤖", "⚛️", "🦉"].map((e, i) => (
+                <motion.div key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.15 + i * 0.04 }}
+                  className="w-8 h-8 rounded-full bg-secondary/80 border-2 border-background flex items-center justify-center text-xs shadow-sm">
+                  {e}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </motion.div>
 
-        {/* Create Room Form */}
+        {/* Create Form */}
         <AnimatePresence>
           {showCreate && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, y: -10 }}
-              animate={{ opacity: 1, height: "auto", y: 0 }}
-              exit={{ opacity: 0, height: 0, y: -10 }}
-              transition={{ type: "spring", stiffness: 200, damping: 22 }}
-              className="overflow-hidden"
-            >
-              <div className="glass rounded-2xl p-5 soft-shadow border border-primary/10 space-y-3">
+            <motion.div initial={{ opacity: 0, height: 0, y: -10 }} animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -10 }} transition={{ type: "spring", stiffness: 200, damping: 22 }} className="overflow-hidden">
+              <div className="glass rounded-2xl p-5 soft-shadow border border-primary/10 space-y-3 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                 <div className="flex items-center gap-2 mb-1">
                   <Sparkles className="w-4 h-4 text-primary" />
                   <span className="text-xs font-display font-bold text-foreground">Create Room</span>
                 </div>
-                <input
-                  type="text" value={newRoomName} onChange={(e) => setNewRoomName(e.target.value)}
-                  placeholder="Room name..."
-                  className="w-full bg-background text-foreground rounded-xl px-4 py-3 text-sm font-medium placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 border border-border/50"
-                  onKeyDown={(e) => e.key === "Enter" && createRoom()}
-                  autoFocus
-                />
-                <input
-                  type="text" value={newTopic} onChange={(e) => setNewTopic(e.target.value)}
-                  placeholder="Current topic (optional)..."
-                  className="w-full bg-background/50 text-foreground rounded-xl px-4 py-2.5 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/20 border border-border/30"
-                />
+                <input type="text" value={newRoomName} onChange={(e) => setNewRoomName(e.target.value)} placeholder="Room name..."
+                  className="w-full bg-background text-foreground rounded-xl px-4 py-3 text-sm font-medium placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 border border-border/50" onKeyDown={(e) => e.key === "Enter" && createRoom()} autoFocus />
+                <input type="text" value={newTopic} onChange={(e) => setNewTopic(e.target.value)} placeholder="Current topic (optional)..."
+                  className="w-full bg-background/50 text-foreground rounded-xl px-4 py-2.5 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/20 border border-border/30" />
                 <div className="flex items-center gap-3">
-                  <motion.button
-                    whileTap={{ scale: 0.92 }}
-                    onClick={() => setIsPrivate(!isPrivate)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
-                      isPrivate
-                        ? "bg-purple-100 text-purple-600 border-purple-200 dark:bg-purple-500/15 dark:text-purple-400 dark:border-purple-500/20"
-                        : "bg-secondary/50 text-muted-foreground border-border/30 hover:text-foreground"
-                    }`}
-                  >
+                  <motion.button whileTap={{ scale: 0.92 }} onClick={() => setIsPrivate(!isPrivate)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${isPrivate ? "bg-purple-100 text-purple-600 border-purple-200 dark:bg-purple-500/15 dark:text-purple-400 dark:border-purple-500/20" : "bg-secondary/50 text-muted-foreground border-border/30 hover:text-foreground"}`}>
                     {isPrivate ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
                     {isPrivate ? "Private" : "Public"}
                   </motion.button>
                   <div className="flex-1" />
-                  <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
-                    Cancel
-                  </button>
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={createRoom}
-                    className="bg-foreground text-background px-5 py-2 rounded-xl text-xs font-bold shadow-md"
-                  >
-                    Create
-                  </motion.button>
+                  <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">Cancel</button>
+                  <motion.button whileTap={{ scale: 0.95 }} onClick={createRoom}
+                    className="bg-foreground text-background px-5 py-2 rounded-xl text-xs font-bold shadow-md">Create</motion.button>
                 </div>
               </div>
             </motion.div>
@@ -350,55 +327,36 @@ const StudyRooms = () => {
         </AnimatePresence>
 
         {/* Search + Filters */}
-        <div className="flex items-center gap-3">
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="flex items-center gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search rooms..."
-              className="w-full bg-secondary/50 text-foreground rounded-xl pl-10 pr-4 py-2.5 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 border border-border/30"
-            />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/30" />
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search rooms or codes..."
+              className="w-full bg-secondary/40 text-foreground rounded-xl pl-10 pr-4 py-2.5 text-xs placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/20 border border-border/20 transition-all focus:bg-secondary/60" />
           </div>
-          <div className="flex gap-0.5 bg-secondary/60 rounded-xl p-0.5 border border-border/30 shrink-0">
+          <div className="flex gap-0.5 bg-secondary/50 rounded-xl p-0.5 border border-border/20 shrink-0">
             {[
-              { key: "all", label: "All" },
-              { key: "public", label: "Open" },
-              { key: "private", label: "Private" },
+              { key: "all", label: "All", count: rooms.length },
+              { key: "public", label: "Open", count: rooms.filter(r => !r.isPrivate).length },
+              { key: "private", label: "Private", count: rooms.filter(r => r.isPrivate).length },
             ].map((f) => (
-              <button
-                key={f.key}
-                onClick={() => setFilterType(f.key)}
-                className="relative px-3.5 py-1.5 rounded-[10px] text-xs font-bold transition-all"
-              >
+              <button key={f.key} onClick={() => setFilterType(f.key)} className="relative px-3 py-1.5 rounded-[10px] text-xs font-bold transition-all">
                 {filterType === f.key && (
-                  <motion.div
-                    layoutId="room-filter"
-                    className="absolute inset-0 bg-foreground rounded-[10px]"
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  />
+                  <motion.div layoutId="rf2" className="absolute inset-0 bg-foreground rounded-[10px]"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }} />
                 )}
-                <span className={`relative z-10 ${filterType === f.key ? "text-background" : "text-muted-foreground"}`}>
-                  {f.label}
+                <span className={`relative z-10 flex items-center gap-1 ${filterType === f.key ? "text-background" : "text-muted-foreground"}`}>
+                  {f.label} <span className={`text-[9px] ${filterType === f.key ? "text-background/50" : "text-muted-foreground/40"}`}>{f.count}</span>
                 </span>
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Room List */}
+        {/* Room Cards */}
         <div className="space-y-3">
           <AnimatePresence mode="popLayout">
-            {filteredRooms.map((room) => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                theme={getTheme(room.id)}
-                onCopy={copyCode}
-                onDelete={deleteRoom}
-                onJoin={joinRoom}
-              />
+            {filteredRooms.map((room, idx) => (
+              <RoomCard key={room.id} room={room} vibe={getVibe(room.id)} onCopy={copyCode} onDelete={deleteRoom} onJoin={joinRoom} index={idx} />
             ))}
           </AnimatePresence>
         </div>
@@ -406,16 +364,11 @@ const StudyRooms = () => {
         {/* Empty */}
         {filteredRooms.length === 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="text-6xl mb-5 inline-block"
-            >
-              🏠
-            </motion.div>
+            <motion.div animate={{ y: [0, -10, 0], rotate: [0, 3, -3, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="text-6xl mb-5 inline-block">🏠</motion.div>
             <p className="font-display font-black text-foreground text-xl">No rooms found</p>
             <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
-              {search ? "Try a different search term" : "Create the first room to start studying together!"}
+              {search ? "Try a different search" : "Create the first room to start studying together!"}
             </p>
           </motion.div>
         )}
