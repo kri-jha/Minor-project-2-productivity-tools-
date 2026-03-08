@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import StudyTimer from "./pages/StudyTimer";
 import TodoPage from "./pages/TodoPage";
 import StudyRooms from "./pages/StudyRooms";
+import SignInPage from "./pages/SignInPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,13 +21,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Navbar />
-        <div className="pt-0 md:pt-16 pb-20 md:pb-0">
+        <div className="pb-20 md:pb-0">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/timer" element={<StudyTimer />} />
             <Route path="/quests" element={<TodoPage />} />
             <Route path="/rooms" element={<StudyRooms />} />
+            <Route path="/signin" element={<SignInPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
