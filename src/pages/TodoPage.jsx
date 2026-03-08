@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { mockTodos } from "@/lib/mockData";
 import { Plus, Trash2, CheckCircle, Circle, Sparkles } from "lucide-react";
+import PageTransition from "@/components/PageTransition";
 
 const TodoPage = () => {
   const [tasks, setTasks] = useState(mockTodos);

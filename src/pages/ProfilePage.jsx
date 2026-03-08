@@ -73,6 +73,7 @@ const ProfilePage = () => {
       {/* Charts */}
       <ProductivityCharts />
     </div>
+    </PageTransition>
   );
 };
 

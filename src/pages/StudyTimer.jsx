@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Play, Pause, RotateCcw, AlertTriangle } from "lucide-react";
-
+import PageTransition from "@/components/PageTransition";
 const StudyTimer = () => {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);

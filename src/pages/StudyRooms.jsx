@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Users, Lock, Unlock, Copy, Trash2 } from "lucide-react";
+import PageTransition from "@/components/PageTransition";
 
 const StudyRooms = () => {
   const [rooms, setRooms] = useState([
