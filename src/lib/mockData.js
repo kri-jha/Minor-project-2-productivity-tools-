@@ -39,30 +39,69 @@ export function generateStreakData() {
   return data;
 }
 
+const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_NAMES_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/**
+ * Weekly: last 7 days with day labels (Mon, Tue, etc.)
+ * Returns empty data for real users — no fake hours.
+ */
 export function generateWeeklyData() {
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  return days.map((day) => ({
-    name: day,
-    hours: +(Math.random() * 6 + 0.5).toFixed(1),
-    tasks: Math.floor(Math.random() * 8) + 1,
-  }));
+  const data = [];
+  const today = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    data.push({
+      name: DAY_NAMES_SHORT[date.getDay()],
+      fullDate: date.toISOString().split("T")[0],
+      hours: 0,
+      tasks: 0,
+    });
+  }
+  return data;
 }
 
+/**
+ * Monthly: last 30 days grouped by date label (e.g. "Mar 1", "Mar 2")
+ */
 export function generateMonthlyData() {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return months.map((month) => ({
-    name: month,
-    hours: Math.floor(Math.random() * 50) + 10,
-    tasks: Math.floor(Math.random() * 30) + 5,
-  }));
+  const data = [];
+  const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    data.push({
+      name: `${MONTH_NAMES_SHORT[date.getMonth()]} ${date.getDate()}`,
+      fullDate: date.toISOString().split("T")[0],
+      hours: 0,
+      tasks: 0,
+    });
+  }
+  return data;
 }
 
+/**
+ * Yearly: last 365 days grouped by month
+ */
 export function generateYearlyData() {
-  return [
-    { name: "2024", hours: 342, tasks: 890 },
-    { name: "2025", hours: 210, tasks: 540 },
-    { name: "2026", hours: 85, tasks: 220 },
-  ];
+  const data = [];
+  const today = new Date();
+  const monthMap = {};
+
+  for (let i = 364; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const key = `${MONTH_NAMES_SHORT[date.getMonth()]} ${date.getFullYear()}`;
+    if (!monthMap[key]) {
+      monthMap[key] = { name: MONTH_NAMES_SHORT[date.getMonth()], hours: 0, tasks: 0 };
+    }
+  }
+
+  for (const key of Object.keys(monthMap)) {
+    data.push(monthMap[key]);
+  }
+  return data;
 }
 
 export const mockTodos = [
