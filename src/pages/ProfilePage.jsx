@@ -90,12 +90,38 @@ const ProfilePage = () => {
     }
 
     setSaving(true);
+
+    let avatarUrl = profile?.avatar_url || null;
+
+    // Upload avatar if selected
+    if (avatarFile) {
+      const fileExt = avatarFile.name.split(".").pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, avatarFile, { upsert: true });
+
+      if (uploadError) {
+        setSaving(false);
+        toast.error("Failed to upload avatar");
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      avatarUrl = urlData.publicUrl + "?t=" + Date.now();
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({
         name: trimmedName,
         about_me: form.aboutMe.trim(),
         contact_no: form.contactNo.trim() || null,
+        avatar_url: avatarUrl,
       })
       .eq("user_id", user.id);
 
