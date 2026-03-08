@@ -1,4 +1,5 @@
 import RankBadge from "@/components/RankBadge";
+import AllRanksModal from "@/components/AllRanksModal";
 import StreakGrid from "@/components/StreakGrid";
 import ProductivityCharts from "@/components/ProductivityCharts";
 import { Flame, Users, Globe, Clock, Star, Zap, Pencil } from "lucide-react";
