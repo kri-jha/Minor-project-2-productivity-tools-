@@ -1,11 +1,23 @@
-import { mockUser, generateStreakData } from "@/lib/mockData";
 import RankBadge from "@/components/RankBadge";
 import StreakGrid from "@/components/StreakGrid";
 import ProductivityCharts from "@/components/ProductivityCharts";
-import { Trophy, Flame, Users, Globe, Clock, Star, Zap } from "lucide-react";
+import { Flame, Users, Globe, Clock, Star, Zap, Pencil } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 // Generate empty streak data (all zeros) for real users — no fake green dots
 const generateEmptyStreakData = () => {
@@ -22,7 +34,58 @@ const generateEmptyStreakData = () => {
 const streakData = generateEmptyStreakData();
 
 const ProfilePage = () => {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, refreshProfile } = useAuth();
+  const [editOpen, setEditOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ name: "", aboutMe: "", contactNo: "" });
+
+  const openEdit = () => {
+    setForm({
+      name: profile?.name || user?.email?.split("@")[0] || "",
+      aboutMe: profile?.about_me || "",
+      contactNo: profile?.contact_no || "",
+    });
+    setEditOpen(true);
+  };
+
+  const handleSave = async () => {
+    const trimmedName = form.name.trim();
+    if (!trimmedName) {
+      toast.error("Name cannot be empty");
+      return;
+    }
+    if (trimmedName.length > 100) {
+      toast.error("Name must be less than 100 characters");
+      return;
+    }
+    if (form.aboutMe.length > 500) {
+      toast.error("About me must be less than 500 characters");
+      return;
+    }
+    if (form.contactNo.length > 30) {
+      toast.error("Contact number must be less than 30 characters");
+      return;
+    }
+
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        name: trimmedName,
+        about_me: form.aboutMe.trim(),
+        contact_no: form.contactNo.trim() || null,
+      })
+      .eq("user_id", user.id);
+
+    setSaving(false);
+    if (error) {
+      toast.error("Failed to update profile");
+    } else {
+      toast.success("Profile updated!");
+      await refreshProfile();
+      setEditOpen(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -57,12 +120,11 @@ const ProfilePage = () => {
     );
   }
 
-  // Use profile data from DB, fallback to mock for display
   const displayUser = {
     name: profile?.name || user.email?.split("@")[0] || "User",
     email: profile?.email || user.email,
     contactNo: profile?.contact_no || "",
-    aboutMe: profile?.about_me || "Hey there! I'm using Productivity to level up 🚀",
+    aboutMe: profile?.about_me || "",
     totalStudyHours: Number(profile?.total_study_hours) || 0,
     points: profile?.points || 0,
     currentStreak: profile?.current_streak || 0,
@@ -74,59 +136,121 @@ const ProfilePage = () => {
 
   return (
     <PageTransition>
-    <div className="min-h-screen p-4 md:p-8 pt-20 max-w-6xl mx-auto space-y-6">
-      {/* Header Card */}
-      <div className="glass rounded-2xl p-6 soft-shadow">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <div className="relative">
-            <div className="w-28 h-28 rounded-2xl bg-secondary flex items-center justify-center text-5xl border border-border">
-              🧑‍💻
+      <div className="min-h-screen p-4 md:p-8 pt-20 max-w-6xl mx-auto space-y-6">
+        {/* Header Card */}
+        <div className="glass rounded-2xl p-6 soft-shadow">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div className="relative">
+              <div className="w-28 h-28 rounded-2xl bg-secondary flex items-center justify-center text-5xl border border-border">
+                🧑‍💻
+              </div>
+              <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-xs font-display font-bold">
+                Lv{Math.floor(displayUser.totalStudyHours / 50)}
+              </div>
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-xs font-display font-bold">
-              Lv{Math.floor(displayUser.totalStudyHours / 50)}
-            </div>
-          </div>
 
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl font-display font-extrabold text-foreground">{displayUser.name}</h1>
-            <p className="text-muted-foreground text-sm mt-1">{displayUser.email}</p>
-            {displayUser.contactNo && (
-              <p className="text-muted-foreground text-xs mt-0.5">📱 {displayUser.contactNo}</p>
-            )}
-            <p className="text-foreground/80 text-sm mt-3 max-w-md">{displayUser.aboutMe}</p>
-            <div className="mt-4">
-              <RankBadge hours={displayUser.totalStudyHours} size="md" />
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center gap-2 justify-center md:justify-start">
+                <h1 className="text-3xl font-display font-extrabold text-foreground">{displayUser.name}</h1>
+                <button
+                  onClick={openEdit}
+                  className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+                  title="Edit profile"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-muted-foreground text-sm mt-1">{displayUser.email}</p>
+              {displayUser.contactNo && (
+                <p className="text-muted-foreground text-xs mt-0.5">📱 {displayUser.contactNo}</p>
+              )}
+              {displayUser.aboutMe && (
+                <p className="text-foreground/80 text-sm mt-3 max-w-md">{displayUser.aboutMe}</p>
+              )}
+              <div className="mt-4">
+                <RankBadge hours={displayUser.totalStudyHours} size="md" />
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col items-center gap-1 bg-primary/5 rounded-xl px-5 py-3 border border-primary/10">
-            <Zap className="w-5 h-5 text-primary" />
-            <p className="text-2xl font-display font-bold text-primary">{displayUser.points.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">XP Points</p>
+            <div className="flex flex-col items-center gap-1 bg-primary/5 rounded-xl px-5 py-3 border border-primary/10">
+              <Zap className="w-5 h-5 text-primary" />
+              <p className="text-2xl font-display font-bold text-primary">{displayUser.points.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">XP Points</p>
+            </div>
           </div>
         </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {[
+            { icon: <Flame className="w-5 h-5 text-neon-orange" />, label: "Current Streak", value: `${displayUser.currentStreak} days` },
+            { icon: <Star className="w-5 h-5 text-neon-cyan" />, label: "Max Streak", value: `${displayUser.maxStreak} days` },
+            { icon: <Clock className="w-5 h-5 text-neon-purple" />, label: "Total Hours", value: `${displayUser.totalStudyHours}h` },
+            { icon: <Globe className="w-5 h-5 text-primary" />, label: "Country Rank", value: displayUser.countryRank ? `#${displayUser.countryRank}` : "--" },
+            { icon: <Users className="w-5 h-5 text-neon-pink" />, label: "Friend Rank", value: displayUser.friendRank ? `#${displayUser.friendRank} / ${displayUser.friendsCount}` : "--" },
+          ].map((stat) => (
+            <div key={stat.label} className="glass rounded-xl p-4 text-center soft-shadow">
+              <div className="flex justify-center mb-2">{stat.icon}</div>
+              <p className="text-lg font-display font-bold text-foreground">{stat.value}</p>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <StreakGrid data={streakData} />
+        <ProductivityCharts />
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {[
-          { icon: <Flame className="w-5 h-5 text-neon-orange" />, label: "Current Streak", value: `${displayUser.currentStreak} days` },
-          { icon: <Star className="w-5 h-5 text-neon-cyan" />, label: "Max Streak", value: `${displayUser.maxStreak} days` },
-          { icon: <Clock className="w-5 h-5 text-neon-purple" />, label: "Total Hours", value: `${displayUser.totalStudyHours}h` },
-          { icon: <Globe className="w-5 h-5 text-primary" />, label: "Country Rank", value: displayUser.countryRank ? `#${displayUser.countryRank}` : "--" },
-          { icon: <Users className="w-5 h-5 text-neon-pink" />, label: "Friend Rank", value: displayUser.friendRank ? `#${displayUser.friendRank} / ${displayUser.friendsCount}` : "--" },
-        ].map((stat) => (
-          <div key={stat.label} className="glass rounded-xl p-4 text-center soft-shadow">
-            <div className="flex justify-center mb-2">{stat.icon}</div>
-            <p className="text-lg font-display font-bold text-foreground">{stat.value}</p>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
+      {/* Edit Profile Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Edit Profile</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Name</Label>
+              <Input
+                id="edit-name"
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                maxLength={100}
+                placeholder="Your name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-about">About Me</Label>
+              <Textarea
+                id="edit-about"
+                value={form.aboutMe}
+                onChange={(e) => setForm((f) => ({ ...f, aboutMe: e.target.value }))}
+                maxLength={500}
+                placeholder="Tell us about yourself..."
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground text-right">{form.aboutMe.length}/500</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-contact">Contact Number</Label>
+              <Input
+                id="edit-contact"
+                value={form.contactNo}
+                onChange={(e) => setForm((f) => ({ ...f, contactNo: e.target.value }))}
+                maxLength={30}
+                placeholder="+1 234 567 8900"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setEditOpen(false)} disabled={saving}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
           </div>
-        ))}
-      </div>
-
-      <StreakGrid data={streakData} />
-      <ProductivityCharts />
-    </div>
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 };

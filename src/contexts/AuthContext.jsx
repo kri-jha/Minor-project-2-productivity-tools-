@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const AuthContext = createContext({ user: null, session: null, profile: null, loading: true, signOut: async () => {} });
+const AuthContext = createContext({ user: null, session: null, profile: null, loading: true, signOut: async () => {}, refreshProfile: async () => {} });
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -55,8 +55,12 @@ export const AuthProvider = ({ children }) => {
     setProfile(null);
   };
 
+  const refreshProfile = async () => {
+    if (user) await fetchProfile(user.id);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, profile, loading, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
