@@ -3,6 +3,7 @@ import RankBadge from "@/components/RankBadge";
 import StreakGrid from "@/components/StreakGrid";
 import ProductivityCharts from "@/components/ProductivityCharts";
 import { Trophy, Flame, Users, Globe, Clock, Star, Zap } from "lucide-react";
+import PageTransition from "@/components/PageTransition";
 
 const streakData = generateStreakData();
 
@@ -10,7 +11,8 @@ const ProfilePage = () => {
   const user = mockUser;
 
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-6xl mx-auto space-y-6">
+    <PageTransition>
+    <div className="min-h-screen p-4 md:p-8 pt-20 max-w-6xl mx-auto space-y-6">
       {/* Header Card */}
       <div className="glass rounded-2xl p-6 soft-shadow">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -71,6 +73,7 @@ const ProfilePage = () => {
       {/* Charts */}
       <ProductivityCharts />
     </div>
+    </PageTransition>
   );
 };
 

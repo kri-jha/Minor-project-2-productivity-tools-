@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles, Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
+import PageTransition from "@/components/PageTransition";
 
 const SignInPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,6 +15,7 @@ const SignInPage = () => {
   };
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-md">
         {/* Logo */}
@@ -115,6 +117,7 @@ const SignInPage = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 
