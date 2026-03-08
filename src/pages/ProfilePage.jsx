@@ -338,6 +338,12 @@ const ProfilePage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AllRanksModal
+        open={ranksOpen}
+        onClose={() => setRanksOpen(false)}
+        currentHours={displayUser.totalStudyHours}
+      />
     </PageTransition>
   );
 };
