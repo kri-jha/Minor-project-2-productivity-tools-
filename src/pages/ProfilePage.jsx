@@ -1,4 +1,5 @@
 import RankBadge from "@/components/RankBadge";
+import AllRanksModal from "@/components/AllRanksModal";
 import StreakGrid from "@/components/StreakGrid";
 import ProductivityCharts from "@/components/ProductivityCharts";
 import { Flame, Users, Globe, Clock, Star, Zap, Pencil } from "lucide-react";
@@ -38,6 +39,7 @@ const streakData = generateEmptyStreakData();
 const ProfilePage = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
+  const [ranksOpen, setRanksOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", aboutMe: "", contactNo: "" });
   const [avatarFile, setAvatarFile] = useState(null);
@@ -218,7 +220,7 @@ const ProfilePage = () => {
               {displayUser.aboutMe && (
                 <p className="text-foreground/80 text-sm mt-3 max-w-md">{displayUser.aboutMe}</p>
               )}
-              <div className="mt-4">
+              <div className="mt-4 cursor-pointer" onClick={() => setRanksOpen(true)}>
                 <RankBadge hours={displayUser.totalStudyHours} size="md" />
               </div>
             </div>
@@ -336,6 +338,12 @@ const ProfilePage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AllRanksModal
+        open={ranksOpen}
+        onClose={() => setRanksOpen(false)}
+        currentHours={displayUser.totalStudyHours}
+      />
     </PageTransition>
   );
 };
