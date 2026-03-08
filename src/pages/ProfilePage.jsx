@@ -259,7 +259,40 @@ const ProfilePage = () => {
             <DialogTitle className="font-display">Edit Profile</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
-            <div className="space-y-2">
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center gap-3">
+              <div
+                className="relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer group border border-border bg-secondary"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {avatarPreview || profile?.avatar_url ? (
+                  <img
+                    src={avatarPreview || profile?.avatar_url}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-4xl">🧑‍💻</div>
+                )}
+                <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-foreground" />
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs text-primary hover:underline"
+              >
+                Change photo
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarSelect}
+              />
+            </div>
               <Label htmlFor="edit-name">Name</Label>
               <Input
                 id="edit-name"
