@@ -3,87 +3,115 @@ import { motion } from "framer-motion";
 
 const TIER_STYLES = {
   Bronze: {
-    gradient: "from-amber-700 via-amber-600 to-yellow-700",
-    glow: "shadow-[0_0_20px_rgba(180,83,9,0.4)]",
-    text: "text-amber-200",
-    accent: "bg-amber-500/20",
-    bar: "from-amber-700 to-amber-500",
+    bg: "bg-gradient-to-br from-amber-900 via-amber-700 to-yellow-800",
+    glow: "shadow-[0_0_30px_rgba(180,83,9,0.5),inset_0_1px_0_rgba(255,255,255,0.15)]",
+    text: "text-amber-100",
+    bar: "from-amber-700 to-amber-400",
     icon: "⚔️",
-    border: "border-amber-600/50",
+    border: "border-amber-500/40",
+    particles: "bg-amber-400",
+    ring: "ring-amber-600/30",
   },
   Silver: {
-    gradient: "from-slate-400 via-gray-300 to-slate-500",
-    glow: "shadow-[0_0_20px_rgba(148,163,184,0.4)]",
-    text: "text-slate-100",
-    accent: "bg-slate-400/20",
+    bg: "bg-gradient-to-br from-slate-600 via-gray-400 to-slate-500",
+    glow: "shadow-[0_0_30px_rgba(148,163,184,0.5),inset_0_1px_0_rgba(255,255,255,0.25)]",
+    text: "text-white",
     bar: "from-slate-500 to-slate-300",
     icon: "🛡️",
-    border: "border-slate-400/50",
+    border: "border-slate-300/40",
+    particles: "bg-slate-300",
+    ring: "ring-slate-400/30",
   },
   Gold: {
-    gradient: "from-yellow-500 via-amber-400 to-yellow-600",
-    glow: "shadow-[0_0_25px_rgba(234,179,8,0.5)]",
-    text: "text-yellow-100",
-    accent: "bg-yellow-400/20",
-    bar: "from-yellow-600 to-yellow-400",
+    bg: "bg-gradient-to-br from-yellow-600 via-amber-400 to-yellow-500",
+    glow: "shadow-[0_0_40px_rgba(234,179,8,0.6),inset_0_1px_0_rgba(255,255,255,0.2)]",
+    text: "text-yellow-50",
+    bar: "from-yellow-600 to-yellow-300",
     icon: "⚜️",
-    border: "border-yellow-500/50",
+    border: "border-yellow-300/50",
+    particles: "bg-yellow-300",
+    ring: "ring-yellow-500/30",
   },
   Platinum: {
-    gradient: "from-cyan-400 via-teal-300 to-emerald-400",
-    glow: "shadow-[0_0_25px_rgba(34,211,238,0.4)]",
-    text: "text-cyan-100",
-    accent: "bg-cyan-400/20",
-    bar: "from-teal-500 to-cyan-400",
+    bg: "bg-gradient-to-br from-cyan-600 via-teal-400 to-emerald-500",
+    glow: "shadow-[0_0_40px_rgba(34,211,238,0.5),inset_0_1px_0_rgba(255,255,255,0.2)]",
+    text: "text-cyan-50",
+    bar: "from-teal-500 to-cyan-300",
     icon: "💎",
-    border: "border-cyan-400/50",
+    border: "border-cyan-300/50",
+    particles: "bg-cyan-300",
+    ring: "ring-cyan-400/30",
   },
   Diamond: {
-    gradient: "from-blue-400 via-indigo-400 to-violet-500",
-    glow: "shadow-[0_0_30px_rgba(99,102,241,0.5)]",
-    text: "text-blue-100",
-    accent: "bg-indigo-400/20",
-    bar: "from-indigo-500 to-blue-400",
+    bg: "bg-gradient-to-br from-blue-600 via-indigo-500 to-violet-600",
+    glow: "shadow-[0_0_45px_rgba(99,102,241,0.6),inset_0_1px_0_rgba(255,255,255,0.2)]",
+    text: "text-blue-50",
+    bar: "from-indigo-500 to-blue-300",
     icon: "💠",
-    border: "border-indigo-400/50",
+    border: "border-indigo-300/50",
+    particles: "bg-indigo-300",
+    ring: "ring-indigo-400/30",
   },
   Crown: {
-    gradient: "from-purple-500 via-fuchsia-500 to-pink-500",
-    glow: "shadow-[0_0_35px_rgba(168,85,247,0.5)]",
-    text: "text-purple-100",
-    accent: "bg-purple-400/20",
-    bar: "from-purple-600 to-fuchsia-400",
+    bg: "bg-gradient-to-br from-purple-700 via-fuchsia-500 to-pink-600",
+    glow: "shadow-[0_0_50px_rgba(168,85,247,0.6),inset_0_1px_0_rgba(255,255,255,0.2)]",
+    text: "text-purple-50",
+    bar: "from-purple-600 to-fuchsia-300",
     icon: "👑",
-    border: "border-purple-400/50",
+    border: "border-purple-300/50",
+    particles: "bg-purple-300",
+    ring: "ring-purple-400/30",
   },
   Ace: {
-    gradient: "from-orange-500 via-red-500 to-rose-600",
-    glow: "shadow-[0_0_35px_rgba(239,68,68,0.5)]",
-    text: "text-orange-100",
-    accent: "bg-red-400/20",
-    bar: "from-red-600 to-orange-400",
+    bg: "bg-gradient-to-br from-orange-600 via-red-500 to-rose-700",
+    glow: "shadow-[0_0_50px_rgba(239,68,68,0.6),inset_0_1px_0_rgba(255,255,255,0.15)]",
+    text: "text-orange-50",
+    bar: "from-red-600 to-orange-300",
     icon: "🔥",
-    border: "border-red-500/50",
+    border: "border-red-400/50",
+    particles: "bg-red-300",
+    ring: "ring-red-500/30",
   },
   "Ace Master": {
-    gradient: "from-red-600 via-rose-500 to-pink-600",
-    glow: "shadow-[0_0_40px_rgba(225,29,72,0.6)]",
-    text: "text-red-100",
-    accent: "bg-rose-400/20",
-    bar: "from-rose-600 to-red-400",
+    bg: "bg-gradient-to-br from-red-700 via-rose-500 to-pink-700",
+    glow: "shadow-[0_0_55px_rgba(225,29,72,0.7),inset_0_1px_0_rgba(255,255,255,0.15)]",
+    text: "text-red-50",
+    bar: "from-rose-600 to-red-300",
     icon: "⚡",
-    border: "border-rose-500/50",
+    border: "border-rose-400/50",
+    particles: "bg-rose-300",
+    ring: "ring-rose-500/30",
   },
   Conqueror: {
-    gradient: "from-yellow-400 via-amber-300 to-yellow-500",
-    glow: "shadow-[0_0_50px_rgba(250,204,21,0.6),0_0_100px_rgba(250,204,21,0.2)]",
+    bg: "bg-gradient-to-br from-yellow-500 via-amber-400 to-yellow-600",
+    glow: "shadow-[0_0_60px_rgba(250,204,21,0.7),0_0_120px_rgba(250,204,21,0.3),inset_0_1px_0_rgba(255,255,255,0.3)]",
     text: "text-yellow-900",
-    accent: "bg-yellow-300/30",
-    bar: "from-yellow-500 to-amber-300",
+    bar: "from-yellow-500 to-amber-200",
     icon: "🏆",
-    border: "border-yellow-400/60",
+    border: "border-yellow-300/60",
+    particles: "bg-yellow-200",
+    ring: "ring-yellow-400/40",
   },
 };
+
+const FloatingParticle = ({ delay, style, className }) => (
+  <motion.div
+    className={`absolute w-1 h-1 rounded-full ${className}`}
+    initial={{ opacity: 0, y: 0, x: 0 }}
+    animate={{
+      opacity: [0, 1, 0],
+      y: [-2, -18],
+      x: [0, (Math.random() - 0.5) * 20],
+    }}
+    transition={{
+      duration: 2,
+      delay,
+      repeat: Infinity,
+      repeatDelay: Math.random() * 2,
+    }}
+    style={style}
+  />
+);
 
 const RankBadge = ({ hours, showProgress = true, size = "md" }) => {
   const rank = getRank(hours);
@@ -92,63 +120,111 @@ const RankBadge = ({ hours, showProgress = true, size = "md" }) => {
   const style = TIER_STYLES[rank.tier] || TIER_STYLES.Bronze;
 
   const sizeConfig = {
-    sm: { badge: "px-3 py-1.5", icon: "text-lg", name: "text-xs", div: "text-[10px]" },
-    md: { badge: "px-5 py-2.5", icon: "text-3xl", name: "text-sm", div: "text-xs" },
-    lg: { badge: "px-7 py-3.5", icon: "text-4xl", name: "text-base", div: "text-sm" },
+    sm: { wrapper: "gap-2", badge: "px-4 py-2 rounded-xl", icon: "text-2xl w-10 h-10", name: "text-xs", div: "text-[9px]", progress: "max-w-[160px]" },
+    md: { wrapper: "gap-3", badge: "px-5 py-3 rounded-2xl", icon: "text-3xl w-12 h-12", name: "text-sm", div: "text-[10px]", progress: "max-w-[220px]" },
+    lg: { wrapper: "gap-4", badge: "px-7 py-4 rounded-2xl", icon: "text-4xl w-14 h-14", name: "text-base", div: "text-xs", progress: "max-w-[260px]" },
   };
   const s = sizeConfig[size];
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      {/* Main Badge */}
+    <div className={`flex flex-col items-center ${s.wrapper}`}>
+      {/* Outer glow ring */}
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className={`relative bg-gradient-to-br ${style.gradient} ${style.glow} rounded-2xl ${s.badge} flex items-center gap-3 border ${style.border} overflow-hidden`}
+        transition={{ type: "spring", stiffness: 180, damping: 14 }}
+        className="relative"
       >
-        {/* Shimmer effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-[shimmer_3s_infinite]" />
+        {/* Animated ring behind badge */}
+        <motion.div
+          className={`absolute -inset-1 rounded-[20px] ${style.bg} opacity-20 blur-md`}
+          animate={{ scale: [1, 1.04, 1] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+        />
 
-        {/* Icon with pulse ring */}
-        <div className="relative">
-          <span className={`${s.icon} relative z-10 drop-shadow-lg`}>{style.icon}</span>
-          <div className={`absolute inset-0 ${style.accent} rounded-full blur-md animate-pulse`} />
-        </div>
+        {/* Main Badge */}
+        <div
+          className={`relative ${style.bg} ${style.glow} ${s.badge} flex items-center gap-3 border ${style.border} overflow-hidden ring-2 ${style.ring}`}
+        >
+          {/* Shimmer sweep */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent animate-[shimmer_3s_infinite] pointer-events-none" />
 
-        {/* Rank text */}
-        <div className="relative z-10 flex flex-col">
-          <span className={`font-display font-extrabold ${s.name} ${style.text} tracking-wider uppercase drop-shadow-md`}>
-            {rank.tier}
-          </span>
-          {rank.division && (
-            <span className={`${s.div} ${style.text} opacity-80 font-bold tracking-widest`}>
-              {rank.division}
+          {/* Floating particles */}
+          {[...Array(5)].map((_, i) => (
+            <FloatingParticle
+              key={i}
+              delay={i * 0.4}
+              className={style.particles}
+              style={{ left: `${15 + i * 18}%`, bottom: "20%" }}
+            />
+          ))}
+
+          {/* Icon container with glow backdrop */}
+          <div className="relative flex items-center justify-center">
+            <motion.div
+              className={`absolute inset-0 ${style.particles} opacity-20 rounded-full blur-lg`}
+              animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.15, 0.3, 0.15] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <motion.div
+              className={`${s.icon} flex items-center justify-center relative z-10`}
+              animate={{ rotateY: [0, 360] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              <span className="drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">{style.icon}</span>
+            </motion.div>
+          </div>
+
+          {/* Rank text block */}
+          <div className="relative z-10 flex flex-col leading-tight">
+            <span className={`font-display font-black ${s.name} ${style.text} tracking-[0.15em] uppercase drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]`}>
+              {rank.tier}
             </span>
-          )}
+            {rank.division && (
+              <span className={`${s.div} ${style.text} opacity-70 font-bold tracking-[0.3em] mt-0.5`}>
+                DIVISION {rank.division}
+              </span>
+            )}
+          </div>
+
+          {/* Corner decorations */}
+          <div className={`absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 ${style.border} rounded-tl-xl opacity-60`} />
+          <div className={`absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 ${style.border} rounded-br-xl opacity-60`} />
         </div>
       </motion.div>
 
-      {/* Progress bar */}
+      {/* XP Progress bar */}
       {showProgress && nextRank && (
-        <div className="w-full max-w-[220px]">
-          <div className="flex justify-between text-[10px] text-muted-foreground mb-1 font-medium">
-            <span>{rank.name}</span>
-            <span>{nextRank.name}</span>
+        <div className={`w-full ${s.progress}`}>
+          <div className="flex justify-between text-[10px] text-muted-foreground mb-1.5 font-semibold tracking-wide">
+            <span className="uppercase">{rank.name}</span>
+            <span className="uppercase opacity-60">{nextRank.name}</span>
           </div>
-          <div className="h-2.5 rounded-full bg-secondary/80 overflow-hidden border border-border/50 backdrop-blur-sm">
+          <div className="relative h-3 rounded-full bg-secondary/60 overflow-hidden border border-border/40 backdrop-blur-sm">
+            {/* Track glow */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+            
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
+              transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.4 }}
               className={`h-full rounded-full bg-gradient-to-r ${style.bar} relative`}
             >
+              {/* Inner shimmer */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_infinite]" />
+              {/* Tip glow */}
+              <div className="absolute right-0 top-0 bottom-0 w-3 bg-white/40 blur-sm rounded-full" />
             </motion.div>
           </div>
-          <p className="text-[10px] text-muted-foreground text-center mt-1.5 font-medium">
-            {hours.toFixed(1)}h / {nextRank.minHours}h
-          </p>
+          <div className="flex justify-between items-center mt-1.5">
+            <p className="text-[10px] text-muted-foreground font-medium">
+              {hours.toFixed(1)}h studied
+            </p>
+            <p className="text-[10px] text-muted-foreground font-medium opacity-60">
+              {nextRank.minHours}h needed
+            </p>
+          </div>
         </div>
       )}
     </div>
