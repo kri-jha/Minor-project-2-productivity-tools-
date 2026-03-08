@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import {
   Bell, BellRing, Clock, Zap, Coffee, Sparkles, Plus, X, Volume2, VolumeX,
@@ -92,15 +92,15 @@ const GlitchText = ({ children, className = "" }) => {
 };
 
 /* ──────────── NOTIFICATION PREVIEW CARD ──────────── */
-const NotifPreview = ({ message, vibe, onClose }) => (
+const NotifPreview = forwardRef(({ message, vibe, onClose }, ref) => (
   <motion.div
+    ref={ref}
     initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: 15 }}
     animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
     exit={{ opacity: 0, y: -20, scale: 0.95, filter: "blur(8px)" }}
     transition={{ type: "spring", stiffness: 400, damping: 25 }}
     className={`relative overflow-hidden rounded-2xl border ${vibe.border} bg-gradient-to-br ${vibe.gradient} backdrop-blur-xl p-5`}
   >
-    {/* Scan line */}
     <motion.div
       className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent h-[2px]"
       animate={{ y: [0, 200] }}
@@ -122,7 +122,6 @@ const NotifPreview = ({ message, vibe, onClose }) => (
         <X className="w-4 h-4" />
       </button>
     </div>
-    {/* Bottom bar */}
     <motion.div
       className={`absolute bottom-0 left-0 h-[3px] ${vibe.accent}`}
       initial={{ width: "100%" }}
@@ -130,7 +129,8 @@ const NotifPreview = ({ message, vibe, onClose }) => (
       transition={{ duration: 4, ease: "linear" }}
     />
   </motion.div>
-);
+));
+NotifPreview.displayName = "NotifPreview";
 
 /* ──────────── STATUS HUD ──────────── */
 const StatusHUD = ({ isActive, preset, breakMode, times, vibe }) => {
