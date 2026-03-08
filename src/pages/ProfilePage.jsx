@@ -40,6 +40,9 @@ const ProfilePage = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", aboutMe: "", contactNo: "" });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const openEdit = () => {
     setForm({
@@ -47,7 +50,24 @@ const ProfilePage = () => {
       aboutMe: profile?.about_me || "",
       contactNo: profile?.contact_no || "",
     });
+    setAvatarFile(null);
+    setAvatarPreview(null);
     setEditOpen(true);
+  };
+
+  const handleAvatarSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be less than 2MB");
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
   };
 
   const handleSave = async () => {
