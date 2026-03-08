@@ -51,7 +51,8 @@ const StudyTimer = () => {
   const progressDeg = (seconds % 60) * 6;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <PageTransition>
+    <div className="min-h-screen flex items-center justify-center p-4 pt-20">
       <div className="max-w-lg w-full space-y-6">
         <div className="text-center">
           <h1 className="text-3xl font-display font-extrabold text-foreground">⏱️ Focus Timer</h1>
