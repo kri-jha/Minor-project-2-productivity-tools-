@@ -1,69 +1,280 @@
 import { Link } from "react-router-dom";
-import { Timer, ListTodo, User, Users, Zap, Trophy, Flame, Sparkles, ArrowRight } from "lucide-react";
+import { Timer, ListTodo, User, Users, Zap, Trophy, Flame, Sparkles, ArrowRight, Star, TrendingUp, CheckCircle } from "lucide-react";
 import { mockUser } from "@/lib/mockData";
-import { getRank, RANK_ICONS } from "@/lib/ranks";
+import { getRank } from "@/lib/ranks";
+import Footer from "@/components/Footer";
+import heroImg from "@/assets/hero-study.png";
+import streaksImg from "@/assets/feature-streaks.png";
+import timerImg from "@/assets/feature-timer.png";
+import roomsImg from "@/assets/feature-rooms.png";
 
 const Index = () => {
   const rank = getRank(mockUser.totalStudyHours);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full space-y-8 text-center">
-        {/* Hero */}
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium">
-            <Sparkles className="w-4 h-4" />
-            Level up your productivity
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-24 pb-16 md:pt-32 md:pb-24">
+        {/* Background decoration */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-primary/5 blur-3xl -z-10" />
+        <div className="absolute top-40 right-0 w-[400px] h-[400px] rounded-full bg-accent/5 blur-3xl -z-10" />
+
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left - Copy */}
+            <div className="space-y-6 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium">
+                <Sparkles className="w-4 h-4" />
+                Gamified productivity for students
+              </div>
+              <h1 className="text-4xl md:text-6xl font-display font-extrabold text-foreground leading-tight">
+                Study smarter.
+                <br />
+                <span className="text-primary">Level up faster.</span>
+              </h1>
+              <p className="text-muted-foreground text-lg max-w-lg">
+                Track your study hours, build insane streaks, earn XP, and compete with friends.
+                The productivity app that actually makes studying fun. 💪
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                <Link
+                  to="/signin"
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-3.5 rounded-full font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+                >
+                  Get Started Free
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/timer"
+                  className="inline-flex items-center justify-center gap-2 bg-secondary text-foreground px-8 py-3.5 rounded-full font-bold text-sm hover:bg-secondary/80 transition-all"
+                >
+                  Try the Timer
+                </Link>
+              </div>
+              {/* Social proof */}
+              <div className="flex items-center gap-4 justify-center md:justify-start pt-2">
+                <div className="flex -space-x-2">
+                  {["🧑‍💻", "👩‍🎓", "🧑‍🎓", "👨‍💻"].map((emoji, i) => (
+                    <div key={i} className="w-8 h-8 rounded-full bg-secondary border-2 border-background flex items-center justify-center text-sm">
+                      {emoji}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-sm">
+                  <span className="font-bold text-foreground">2,400+</span>
+                  <span className="text-muted-foreground"> students grinding</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right - Hero Image */}
+            <div className="flex justify-center md:justify-end">
+              <div className="relative">
+                <div className="w-full max-w-md">
+                  <img src={heroImg} alt="Student studying with productivity tools" className="w-full h-auto" />
+                </div>
+                {/* Floating stat cards */}
+                <div className="absolute -left-4 top-8 glass rounded-xl p-3 soft-shadow animate-float">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-5 h-5 text-neon-orange" />
+                    <div>
+                      <p className="text-xs font-bold text-foreground">23 Day Streak</p>
+                      <p className="text-[10px] text-muted-foreground">Keep going!</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -right-4 bottom-20 glass rounded-xl p-3 soft-shadow animate-float" style={{ animationDelay: "1s" }}>
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-rank-gold" />
+                    <div>
+                      <p className="text-xs font-bold text-foreground">Gold III</p>
+                      <p className="text-[10px] text-muted-foreground">290h studied</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-display font-extrabold text-foreground">
-            Productivity
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-md mx-auto">
-            Track study hours. Build streaks. Climb the ranks.
-            <span className="text-primary font-medium"> Let's go!</span> 💪
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="border-y border-border bg-card/50">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              { value: "2.4K+", label: "Active Students" },
+              { value: "50K+", label: "Hours Logged" },
+              { value: "1.2M+", label: "Tasks Completed" },
+              { value: "33", label: "Ranks to Climb" },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <p className="text-2xl md:text-3xl font-display font-extrabold text-foreground">{stat.value}</p>
+                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+              <Star className="w-4 h-4" />
+              Features
+            </div>
+            <h2 className="text-3xl md:text-4xl font-display font-extrabold text-foreground">
+              Everything you need to stay on track
+            </h2>
+            <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
+              Built by students, for students. Every feature is designed to keep you motivated and accountable.
+            </p>
+          </div>
+
+          {/* Feature 1 - Timer */}
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+            <div className="order-2 md:order-1">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium mb-4">
+                <Timer className="w-3 h-3" />
+                Focus Timer
+              </div>
+              <h3 className="text-2xl font-display font-extrabold text-foreground mb-3">
+                Anti-cheat focus timer
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Our smart timer detects when you switch tabs and pauses automatically. No more fake study hours — only real focus counts toward your rank.
+              </p>
+              <ul className="space-y-3">
+                {["Pauses on tab switch", "Earn 2 XP per minute", "Track total study hours"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="order-1 md:order-2 flex justify-center">
+              <div className="bg-secondary/50 rounded-3xl p-8 w-full max-w-sm">
+                <img src={timerImg} alt="Focus timer feature" className="w-full h-auto" />
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 2 - Streaks */}
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+            <div className="flex justify-center">
+              <div className="bg-secondary/50 rounded-3xl p-8 w-full max-w-sm">
+                <img src={streaksImg} alt="Streak tracking feature" className="w-full h-auto" />
+              </div>
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-2 bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-4">
+                <TrendingUp className="w-3 h-3" />
+                Streaks & Progress
+              </div>
+              <h3 className="text-2xl font-display font-extrabold text-foreground mb-3">
+                Build your streak. Don't break it.
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Just like LeetCode, your contribution grid shows your daily consistency. The more tasks you complete, the darker the green. Stay consistent and watch your streak grow.
+              </p>
+              <ul className="space-y-3">
+                {["GitHub-style streak grid", "Color intensity based on completion %", "Max streak tracking"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Feature 3 - Rooms */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-2 md:order-1">
+              <div className="inline-flex items-center gap-2 bg-neon-purple/10 text-neon-purple px-3 py-1 rounded-full text-xs font-medium mb-4">
+                <Users className="w-3 h-3" />
+                Study Rooms
+              </div>
+              <h3 className="text-2xl font-display font-extrabold text-foreground mb-3">
+                Study together, grow together
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                Create or join study rooms with your friends. Share invite codes, see who's online, and keep each other accountable while grinding.
+              </p>
+              <ul className="space-y-3">
+                {["Create public or private rooms", "Share invite codes", "See live study buddies"].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="order-1 md:order-2 flex justify-center">
+              <div className="bg-secondary/50 rounded-3xl p-8 w-full max-w-sm">
+                <img src={roomsImg} alt="Study rooms feature" className="w-full h-auto" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Rank System Preview */}
+      <section className="py-20 bg-card/50 border-y border-border">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 text-center">
+          <div className="inline-flex items-center gap-2 bg-rank-gold/10 text-rank-gold px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+            <Trophy className="w-4 h-4" />
+            Rank System
+          </div>
+          <h2 className="text-3xl md:text-4xl font-display font-extrabold text-foreground mb-4">
+            From Bronze to Conqueror
+          </h2>
+          <p className="text-muted-foreground max-w-lg mx-auto mb-12">
+            33 ranks across 9 tiers. Start from Bronze V and grind your way to the legendary Conqueror rank at 2,200+ study hours.
           </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {[
+              { tier: "Bronze", icon: "🥉", color: "bg-rank-bronze/10 text-rank-bronze border-rank-bronze/20" },
+              { tier: "Silver", icon: "🥈", color: "bg-rank-silver/10 text-rank-silver border-rank-silver/20" },
+              { tier: "Gold", icon: "🥇", color: "bg-rank-gold/10 text-rank-gold border-rank-gold/20" },
+              { tier: "Platinum", icon: "💎", color: "bg-rank-platinum/10 text-rank-platinum border-rank-platinum/20" },
+              { tier: "Diamond", icon: "💠", color: "bg-rank-diamond/10 text-rank-diamond border-rank-diamond/20" },
+              { tier: "Crown", icon: "👑", color: "bg-rank-crown/10 text-rank-crown border-rank-crown/20" },
+              { tier: "Ace", icon: "🔥", color: "bg-rank-ace/10 text-rank-ace border-rank-ace/20" },
+              { tier: "Conqueror", icon: "🏆", color: "bg-rank-conqueror/10 text-rank-conqueror border-rank-conqueror/20" },
+            ].map((r) => (
+              <div key={r.tier} className={`${r.color} border rounded-xl px-5 py-3 font-display font-bold text-sm flex items-center gap-2`}>
+                <span className="text-lg">{r.icon}</span>
+                {r.tier}
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="glass rounded-2xl p-4 soft-shadow">
-            <Flame className="w-6 h-6 text-neon-orange mx-auto mb-1" />
-            <p className="text-xl font-display font-bold text-foreground">{mockUser.currentStreak}</p>
-            <p className="text-xs text-muted-foreground">Day Streak</p>
-          </div>
-          <div className="glass rounded-2xl p-4 soft-shadow">
-            <Trophy className="w-6 h-6 text-neon-cyan mx-auto mb-1" />
-            <p className="text-xl font-display font-bold text-foreground">{rank.name}</p>
-            <p className="text-xs text-muted-foreground">Current Rank</p>
-          </div>
-          <div className="glass rounded-2xl p-4 soft-shadow">
-            <Zap className="w-6 h-6 text-neon-orange mx-auto mb-1" />
-            <p className="text-xl font-display font-bold text-foreground">{mockUser.points.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">XP Points</p>
-          </div>
+      {/* CTA Section */}
+      <section className="py-20">
+        <div className="max-w-3xl mx-auto px-4 md:px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-display font-extrabold text-foreground mb-4">
+            Ready to start grinding?
+          </h2>
+          <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
+            Join thousands of students who are leveling up their productivity every single day.
+          </p>
+          <Link
+            to="/signin"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-10 py-4 rounded-full font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+          >
+            Start for Free
+            <ArrowRight className="w-5 h-5" />
+          </Link>
         </div>
+      </section>
 
-        {/* Navigation Cards */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { to: "/timer", icon: <Timer className="w-7 h-7" />, label: "Start Studying", desc: "Focus timer with anti-cheat", color: "text-primary" },
-            { to: "/quests", icon: <ListTodo className="w-7 h-7" />, label: "Daily Quests", desc: "Track your tasks", color: "text-neon-cyan" },
-            { to: "/profile", icon: <User className="w-7 h-7" />, label: "Profile", desc: "Stats, rank & streaks", color: "text-neon-purple" },
-            { to: "/rooms", icon: <Users className="w-7 h-7" />, label: "Study Rooms", desc: "Study with friends", color: "text-neon-pink" },
-          ].map((card) => (
-            <Link
-              key={card.to}
-              to={card.to}
-              className="glass rounded-2xl p-5 hover:shadow-md transition-all group text-left soft-shadow border border-border hover:border-primary/20"
-            >
-              <div className={`${card.color} mb-3 group-hover:scale-110 transition-transform`}>{card.icon}</div>
-              <p className="font-display font-bold text-sm text-foreground">{card.label}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{card.desc}</p>
-              <ArrowRight className="w-4 h-4 text-muted-foreground mt-2 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-            </Link>
-          ))}
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 };
