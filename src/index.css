@@ -2,69 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 230 25% 7%;
-    --foreground: 210 40% 93%;
+    --background: 210 20% 98%;
+    --foreground: 220 20% 15%;
 
-    --card: 230 20% 10%;
-    --card-foreground: 210 40% 93%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
 
-    --popover: 230 20% 10%;
-    --popover-foreground: 210 40% 93%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
 
-    --primary: 160 100% 45%;
-    --primary-foreground: 230 25% 7%;
+    --primary: 220 80% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 230 20% 15%;
-    --secondary-foreground: 210 40% 93%;
+    --secondary: 220 15% 94%;
+    --secondary-foreground: 220 20% 15%;
 
-    --muted: 230 15% 14%;
-    --muted-foreground: 215 15% 55%;
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 50%;
 
-    --accent: 190 100% 50%;
-    --accent-foreground: 230 25% 7%;
+    --accent: 160 60% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 80% 55%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 230 15% 18%;
-    --input: 230 15% 18%;
-    --ring: 160 100% 45%;
+    --border: 220 15% 90%;
+    --input: 220 15% 90%;
+    --ring: 220 80% 55%;
 
     --radius: 0.75rem;
 
-    --neon-green: 160 100% 45%;
-    --neon-cyan: 190 100% 50%;
-    --neon-purple: 270 100% 65%;
-    --neon-orange: 25 100% 55%;
-    --neon-pink: 330 100% 60%;
+    --neon-green: 160 60% 40%;
+    --neon-cyan: 200 70% 50%;
+    --neon-purple: 260 60% 55%;
+    --neon-orange: 25 90% 55%;
+    --neon-pink: 330 70% 55%;
 
-    --streak-0: 160 20% 15%;
-    --streak-1: 160 50% 25%;
-    --streak-2: 160 70% 35%;
-    --streak-3: 160 85% 40%;
-    --streak-4: 160 100% 45%;
+    --streak-0: 220 15% 92%;
+    --streak-1: 160 40% 75%;
+    --streak-2: 160 50% 55%;
+    --streak-3: 160 60% 42%;
+    --streak-4: 160 70% 32%;
 
-    --rank-bronze: 30 70% 45%;
-    --rank-silver: 210 10% 65%;
-    --rank-gold: 45 100% 55%;
-    --rank-platinum: 190 60% 60%;
-    --rank-diamond: 200 100% 65%;
-    --rank-crown: 45 100% 65%;
-    --rank-ace: 0 100% 60%;
-    --rank-conqueror: 330 100% 55%;
+    --rank-bronze: 30 60% 50%;
+    --rank-silver: 210 10% 60%;
+    --rank-gold: 45 90% 50%;
+    --rank-platinum: 200 50% 55%;
+    --rank-diamond: 210 80% 55%;
+    --rank-crown: 45 90% 55%;
+    --rank-ace: 0 80% 55%;
+    --rank-conqueror: 330 80% 50%;
 
-    --sidebar-background: 230 25% 5%;
-    --sidebar-foreground: 210 40% 93%;
-    --sidebar-primary: 160 100% 45%;
-    --sidebar-primary-foreground: 230 25% 7%;
-    --sidebar-accent: 230 20% 12%;
-    --sidebar-accent-foreground: 210 40% 93%;
-    --sidebar-border: 230 15% 15%;
-    --sidebar-ring: 160 100% 45%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 20% 15%;
+    --sidebar-primary: 220 80% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 96%;
+    --sidebar-accent-foreground: 220 20% 15%;
+    --sidebar-border: 220 15% 90%;
+    --sidebar-ring: 220 80% 55%;
   }
 }
 
@@ -83,25 +83,16 @@
 }
 
 @layer utilities {
-  .glow-green {
-    box-shadow: 0 0 15px hsl(160 100% 45% / 0.3), 0 0 45px hsl(160 100% 45% / 0.1);
+  .glow-primary {
+    box-shadow: 0 4px 20px hsl(220 80% 55% / 0.12);
   }
-  .glow-cyan {
-    box-shadow: 0 0 15px hsl(190 100% 50% / 0.3), 0 0 45px hsl(190 100% 50% / 0.1);
-  }
-  .glow-purple {
-    box-shadow: 0 0 15px hsl(270 100% 65% / 0.3), 0 0 45px hsl(270 100% 65% / 0.1);
-  }
-  .text-glow-green {
-    text-shadow: 0 0 10px hsl(160 100% 45% / 0.5);
-  }
-  .text-glow-cyan {
-    text-shadow: 0 0 10px hsl(190 100% 50% / 0.5);
+  .glow-accent {
+    box-shadow: 0 4px 20px hsl(160 60% 45% / 0.12);
   }
   .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-border;
+    @apply bg-card border border-border shadow-sm;
   }
-  .neon-border {
-    border: 1px solid hsl(160 100% 45% / 0.3);
+  .soft-shadow {
+    box-shadow: 0 1px 3px hsl(220 20% 15% / 0.06), 0 4px 12px hsl(220 20% 15% / 0.04);
   }
 }
