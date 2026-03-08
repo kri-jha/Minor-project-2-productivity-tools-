@@ -95,6 +95,7 @@ const StudyRooms = () => {
         ))}
       </div>
     </div>
+    </PageTransition>
   );
 };
 

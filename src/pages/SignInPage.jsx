@@ -15,6 +15,7 @@ const SignInPage = () => {
   };
 
   return (
+    <PageTransition>
     <div className="min-h-screen flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-md">
         {/* Logo */}
