@@ -218,7 +218,7 @@ const ProfilePage = () => {
               {displayUser.aboutMe && (
                 <p className="text-foreground/80 text-sm mt-3 max-w-md">{displayUser.aboutMe}</p>
               )}
-              <div className="mt-4">
+              <div className="mt-4 cursor-pointer" onClick={() => setRanksOpen(true)}>
                 <RankBadge hours={displayUser.totalStudyHours} size="md" />
               </div>
             </div>
