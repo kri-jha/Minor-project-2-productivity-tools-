@@ -1,23 +1,73 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Sparkles, Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Sparkles, Mail, Lock, User, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import PageTransition from "@/components/PageTransition";
 
 const SignInPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Connect to backend
-    console.log(isLogin ? "Login" : "Register", form);
+    if (!form.email.trim() || !form.password.trim()) {
+      toast({ title: "Please fill in all fields", variant: "destructive" });
+      return;
+    }
+    if (form.password.length < 6) {
+      toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        });
+        if (error) throw error;
+        toast({ title: "Welcome back! 🎉" });
+        navigate("/profile");
+      } else {
+        if (!form.name.trim()) {
+          toast({ title: "Please enter your name", variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+        const { error } = await supabase.auth.signUp({
+          email: form.email,
+          password: form.password,
+          options: {
+            data: { name: form.name },
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (error) throw error;
+        toast({ title: "Account created! Check your email to confirm. ✉️" });
+      }
+    } catch (error) {
+      toast({ title: error.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <PageTransition>
     <div className="min-h-screen flex items-center justify-center p-4 pt-20">
-      <div className="w-full max-w-md">
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
@@ -88,18 +138,19 @@ const SignInPage = () => {
               </div>
             </div>
 
-            {isLogin && (
-              <div className="flex justify-end">
-                <a href="#" className="text-xs text-primary hover:underline">Forgot password?</a>
-              </div>
-            )}
-
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-all"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-all disabled:opacity-60"
             >
-              {isLogin ? "Sign In" : "Create Account"}
-              <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  {isLogin ? "Sign In" : "Create Account"}
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
@@ -115,7 +166,7 @@ const SignInPage = () => {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
     </PageTransition>
   );

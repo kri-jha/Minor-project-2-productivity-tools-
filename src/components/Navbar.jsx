@@ -1,11 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, LogIn } from "lucide-react";
+import { Sparkles, LogIn, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -72,15 +74,33 @@ const Navbar = () => {
           })}
         </div>
 
-        {/* Sign In Button */}
+        {/* Auth Button */}
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Link
-            to="/signin"
-            className="flex items-center gap-2 bg-foreground text-background px-5 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-all"
-          >
-            <LogIn className="w-4 h-4" />
-            <span className="hidden sm:inline">Sign In</span>
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <Link to="/profile" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <span className="hidden sm:inline font-medium">{profile?.name || "Profile"}</span>
+              </Link>
+              <button
+                onClick={signOut}
+                className="flex items-center gap-2 bg-secondary text-foreground px-4 py-2 rounded-full text-sm font-semibold hover:bg-secondary/80 transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/signin"
+              className="flex items-center gap-2 bg-foreground text-background px-5 py-2 rounded-full text-sm font-semibold hover:opacity-90 transition-all"
+            >
+              <LogIn className="w-4 h-4" />
+              <span className="hidden sm:inline">Sign In</span>
+            </Link>
+          )}
         </motion.div>
       </div>
 
