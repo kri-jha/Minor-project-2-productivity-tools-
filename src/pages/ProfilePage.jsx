@@ -7,7 +7,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
 
-const streakData = generateStreakData();
+// Generate empty streak data (all zeros) for real users — no fake green dots
+const generateEmptyStreakData = () => {
+  const data = [];
+  const today = new Date();
+  for (let i = 364; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    data.push({ date: date.toISOString().split("T")[0], percentage: 0, level: 0 });
+  }
+  return data;
+};
+
+const streakData = generateEmptyStreakData();
 
 const ProfilePage = () => {
   const { user, profile, loading } = useAuth();
