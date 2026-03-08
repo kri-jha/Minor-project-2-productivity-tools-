@@ -39,6 +39,7 @@ const streakData = generateEmptyStreakData();
 const ProfilePage = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
+  const [ranksOpen, setRanksOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", aboutMe: "", contactNo: "" });
   const [avatarFile, setAvatarFile] = useState(null);
