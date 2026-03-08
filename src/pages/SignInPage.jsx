@@ -117,6 +117,7 @@ const SignInPage = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 };
 
