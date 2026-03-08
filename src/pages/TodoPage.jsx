@@ -42,7 +42,8 @@ const TodoPage = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 max-w-3xl mx-auto space-y-6">
+    <PageTransition>
+    <div className="min-h-screen p-4 md:p-8 pt-20 max-w-3xl mx-auto space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-display font-extrabold text-foreground">📝 Daily Quests</h1>
         <p className="text-muted-foreground text-sm mt-1">Complete your quests. Build your streak.</p>

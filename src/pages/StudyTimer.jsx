@@ -138,6 +138,7 @@ const StudyTimer = () => {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 };
 
