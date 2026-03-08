@@ -13,6 +13,7 @@ import TodoPage from "./pages/TodoPage";
 import StudyRooms from "./pages/StudyRooms";
 import SignInPage from "./pages/SignInPage";
 import NotFound from "./pages/NotFound";
+import RemindersPage from "./pages/RemindersPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const AnimatedRoutes = () => {
         <Route path="/timer" element={<StudyTimer />} />
         <Route path="/quests" element={<TodoPage />} />
         <Route path="/rooms" element={<StudyRooms />} />
+        <Route path="/reminders" element={<RemindersPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

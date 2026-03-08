@@ -21,6 +21,7 @@ const Navbar = () => {
     { to: "/timer", label: "Timer" },
     { to: "/quests", label: "Quests" },
     { to: "/rooms", label: "Rooms" },
+    { to: "/reminders", label: "Reminders" },
   ];
 
   return (
