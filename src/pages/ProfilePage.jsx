@@ -293,6 +293,7 @@ const ProfilePage = () => {
                 onChange={handleAvatarSelect}
               />
             </div>
+            <div className="space-y-2">
               <Label htmlFor="edit-name">Name</Label>
               <Input
                 id="edit-name"
