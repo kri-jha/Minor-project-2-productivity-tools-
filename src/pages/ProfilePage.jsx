@@ -5,9 +5,11 @@ import { Flame, Users, Globe, Clock, Star, Zap, Pencil } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Camera } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +40,9 @@ const ProfilePage = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ name: "", aboutMe: "", contactNo: "" });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const openEdit = () => {
     setForm({
@@ -45,7 +50,24 @@ const ProfilePage = () => {
       aboutMe: profile?.about_me || "",
       contactNo: profile?.contact_no || "",
     });
+    setAvatarFile(null);
+    setAvatarPreview(null);
     setEditOpen(true);
+  };
+
+  const handleAvatarSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be less than 2MB");
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
   };
 
   const handleSave = async () => {
@@ -68,12 +90,38 @@ const ProfilePage = () => {
     }
 
     setSaving(true);
+
+    let avatarUrl = profile?.avatar_url || null;
+
+    // Upload avatar if selected
+    if (avatarFile) {
+      const fileExt = avatarFile.name.split(".").pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, avatarFile, { upsert: true });
+
+      if (uploadError) {
+        setSaving(false);
+        toast.error("Failed to upload avatar");
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      avatarUrl = urlData.publicUrl + "?t=" + Date.now();
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({
         name: trimmedName,
         about_me: form.aboutMe.trim(),
         contact_no: form.contactNo.trim() || null,
+        avatar_url: avatarUrl,
       })
       .eq("user_id", user.id);
 
@@ -141,9 +189,12 @@ const ProfilePage = () => {
         <div className="glass rounded-2xl p-6 soft-shadow">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             <div className="relative">
-              <div className="w-28 h-28 rounded-2xl bg-secondary flex items-center justify-center text-5xl border border-border">
-                🧑‍💻
-              </div>
+              <Avatar className="w-28 h-28 rounded-2xl border border-border">
+                {profile?.avatar_url ? (
+                  <AvatarImage src={profile.avatar_url} alt={displayUser.name} className="object-cover" />
+                ) : null}
+                <AvatarFallback className="rounded-2xl bg-secondary text-5xl">🧑‍💻</AvatarFallback>
+              </Avatar>
               <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-xs font-display font-bold">
                 Lv{Math.floor(displayUser.totalStudyHours / 50)}
               </div>
@@ -208,7 +259,40 @@ const ProfilePage = () => {
             <DialogTitle className="font-display">Edit Profile</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
-            <div className="space-y-2">
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center gap-3">
+              <div
+                className="relative w-24 h-24 rounded-2xl overflow-hidden cursor-pointer group border border-border bg-secondary"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {avatarPreview || profile?.avatar_url ? (
+                  <img
+                    src={avatarPreview || profile?.avatar_url}
+                    alt="Avatar"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-4xl">🧑‍💻</div>
+                )}
+                <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-foreground" />
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs text-primary hover:underline"
+              >
+                Change photo
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarSelect}
+              />
+            </div>
               <Label htmlFor="edit-name">Name</Label>
               <Input
                 id="edit-name"
