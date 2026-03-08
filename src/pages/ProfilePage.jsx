@@ -189,9 +189,12 @@ const ProfilePage = () => {
         <div className="glass rounded-2xl p-6 soft-shadow">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             <div className="relative">
-              <div className="w-28 h-28 rounded-2xl bg-secondary flex items-center justify-center text-5xl border border-border">
-                🧑‍💻
-              </div>
+              <Avatar className="w-28 h-28 rounded-2xl border border-border">
+                {profile?.avatar_url ? (
+                  <AvatarImage src={profile.avatar_url} alt={displayUser.name} className="object-cover" />
+                ) : null}
+                <AvatarFallback className="rounded-2xl bg-secondary text-5xl">🧑‍💻</AvatarFallback>
+              </Avatar>
               <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-xs font-display font-bold">
                 Lv{Math.floor(displayUser.totalStudyHours / 50)}
               </div>
