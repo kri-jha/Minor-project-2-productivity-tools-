@@ -1,6 +1,6 @@
-# Grind Ace Zen 🚀
+# Gamified Productivity Tool 🚀
 
-Grind Ace Zen is a comprehensive, modern productivity and study application designed to help students and professionals focus, collaborate, and manage their time effectively.
+Gamified Productivity Tool is a comprehensive, modern productivity and study application designed to help students and professionals focus, collaborate, and manage their time effectively.
 
 ## 🌟 Features
 
