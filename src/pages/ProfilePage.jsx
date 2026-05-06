@@ -6,8 +6,7 @@ import { Flame, Users, Globe, Clock, Star, Zap, Pencil } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
-import { useState, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
@@ -22,19 +21,56 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-// Generate empty streak data (all zeros) for real users — no fake green dots
-const generateEmptyStreakData = () => {
+// Generate streak heatmap data from an array of date strings ["2025-04-01", ...]
+// Generate streak heatmap data from an array of date strings ["2025-04-01", ...]
+const generateStreakData = (days) => {
+  const studyDays = Array.isArray(days) ? days : [];
+  const studySet = new Set(studyDays);
   const data = [];
   const today = new Date();
   for (let i = 364; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    data.push({ date: date.toISOString().split("T")[0], percentage: 0, level: 0 });
+    const dateStr = date.toISOString().split("T")[0];
+    const studied = studySet.has(dateStr);
+    data.push({ date: dateStr, percentage: studied ? 100 : 0, level: studied ? 4 : 0 });
   }
   return data;
 };
 
-const streakData = generateEmptyStreakData();
+// Calculate current streak from sorted study days
+const calcCurrentStreak = (days) => {
+  const studyDays = Array.isArray(days) ? days : [];
+  if (!studyDays.length) return 0;
+  const sorted = [...studyDays].sort().reverse(); // newest first
+  let streak = 0;
+  const today = new Date().toISOString().split("T")[0];
+  let checkDate = today;
+  for (const day of sorted) {
+    if (day === checkDate) {
+      streak++;
+      const d = new Date(checkDate);
+      d.setDate(d.getDate() - 1);
+      checkDate = d.toISOString().split("T")[0];
+    } else break;
+  }
+  return streak;
+};
+
+const calcMaxStreak = (days) => {
+  const studyDays = Array.isArray(days) ? days : [];
+  if (!studyDays.length) return 0;
+  const sorted = [...studyDays].sort();
+  let max = 1, curr = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = new Date(sorted[i - 1]);
+    const cur = new Date(sorted[i]);
+    const diff = Math.round((cur - prev) / (1000 * 60 * 60 * 24));
+    if (diff === 1) { curr++; max = Math.max(max, curr); }
+    else if (diff > 0) curr = 1;
+  }
+  return max;
+};
 
 const ProfilePage = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
@@ -46,10 +82,26 @@ const ProfilePage = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const fileInputRef = useRef(null);
 
+  // Live presence: check if user is currently in a study room
+  const [isLive, setIsLive] = useState(() => !!localStorage.getItem("gazen_in_room"));
+  useEffect(() => {
+    const check = () => setIsLive(!!localStorage.getItem("gazen_in_room"));
+    // Poll every 3 seconds (lightweight, since it's just localStorage)
+    const interval = setInterval(check, 3000);
+    window.addEventListener("storage", check);
+    return () => { clearInterval(interval); window.removeEventListener("storage", check); };
+  }, []);
+
+  // Derived streak and heatmap data from real profile
+  const streakData = generateStreakData(profile?.studyDays);
+  const currentStreak = calcCurrentStreak(profile?.studyDays);
+  const maxStreak = calcMaxStreak(profile?.studyDays);
+  const totalStudyHours = Math.floor((profile?.totalStudySeconds || 0) / 3600);
+
   const openEdit = () => {
     setForm({
-      name: profile?.name || user?.email?.split("@")[0] || "",
-      aboutMe: profile?.about_me || "",
+      name: profile?.full_name || profile?.username || user?.email?.split("@")[0] || "",
+      aboutMe: profile?.bio || "",
       contactNo: profile?.contact_no || "",
     });
     setAvatarFile(null);
@@ -95,55 +147,58 @@ const ProfilePage = () => {
 
     let avatarUrl = profile?.avatar_url || null;
 
-    // Upload avatar if selected
-    if (avatarFile) {
-      const fileExt = avatarFile.name.split(".").pop();
-      const filePath = `${user.id}/avatar.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, avatarFile, { upsert: true });
-
-      if (uploadError) {
-        setSaving(false);
-        toast.error("Failed to upload avatar");
-        return;
+    try {
+      // Upload avatar if selected
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("avatar", avatarFile);
+        
+        const uploadRes = await fetch("/api/users/avatar", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`
+          },
+          body: formData
+        });
+        
+        if (!uploadRes.ok) throw new Error("Failed to upload avatar");
+        const uploadData = await uploadRes.json();
+        avatarUrl = uploadData.avatar_url;
       }
 
-      const { data: urlData } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(filePath);
+      const updateRes = await fetch("/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`
+        },
+        body: JSON.stringify({
+          full_name: trimmedName,
+          about_me: form.aboutMe.trim(),
+          contact_no: form.contactNo.trim() || null,
+          avatar_url: avatarUrl,
+        })
+      });
 
-      avatarUrl = urlData.publicUrl + "?t=" + Date.now();
-    }
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        name: trimmedName,
-        about_me: form.aboutMe.trim(),
-        contact_no: form.contactNo.trim() || null,
-        avatar_url: avatarUrl,
-      })
-      .eq("user_id", user.id);
-
-    setSaving(false);
-    if (error) {
-      toast.error("Failed to update profile");
-    } else {
+      if (!updateRes.ok) throw new Error("Failed to update profile");
+      
       toast.success("Profile updated!");
       await refreshProfile();
       setEditOpen(false);
+    } catch (error) {
+      toast.error(error.message || "Failed to update profile");
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading) {
+  if (loading || (user && !profile)) {
     return (
       <PageTransition>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-muted-foreground text-sm">Loading profile...</p>
+            <p className="text-muted-foreground text-sm font-medium">Initializing profile stats...</p>
           </div>
         </div>
       </PageTransition>
@@ -171,17 +226,17 @@ const ProfilePage = () => {
   }
 
   const displayUser = {
-    name: profile?.name || user.email?.split("@")[0] || "User",
-    email: profile?.email || user.email,
+    name: profile?.full_name || profile?.username || user?.email?.split("@")[0] || "User",
+    email: user?.email || "",
     contactNo: profile?.contact_no || "",
-    aboutMe: profile?.about_me || "",
-    totalStudyHours: Number(profile?.total_study_hours) || 0,
-    points: profile?.points || 0,
-    currentStreak: profile?.current_streak || 0,
-    maxStreak: profile?.max_streak || 0,
-    countryRank: profile?.country_rank || 0,
-    friendRank: profile?.friend_rank || 0,
-    friendsCount: profile?.friends_count || 0,
+    aboutMe: profile?.bio || "",
+    totalStudyHours,
+    points: profile?.xp || 0,
+    currentStreak,
+    maxStreak,
+    countryRank: 0,
+    friendRank: 0,
+    friendsCount: 0,
   };
 
   return (
@@ -197,6 +252,13 @@ const ProfilePage = () => {
                 ) : null}
                 <AvatarFallback className="rounded-2xl bg-secondary text-5xl">🧑‍💻</AvatarFallback>
               </Avatar>
+              {/* Live green dot — shown when user is inside a Study Room */}
+              {isLive && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4" title="Currently in a study room">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-background"></span>
+                </span>
+              )}
               <div className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center text-xs font-display font-bold">
                 Lv{Math.floor(displayUser.totalStudyHours / 50)}
               </div>

@@ -3,6 +3,8 @@ import { Plus, Users, Lock, Unlock, Copy, Trash2, DoorOpen, Radio, Wifi, Sparkle
 import PageTransition from "@/components/PageTransition";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ROOM_VIBES = [
   { tag: "🔥 Intense", bg: "from-orange-500/10 via-amber-500/5 to-transparent", border: "border-orange-400/20", glow: "hover:shadow-[0_0_30px_rgba(249,115,22,0.08)]", accent: "text-orange-500", accentBg: "bg-orange-500/10", stripe: "from-orange-500/40 via-amber-400/20 to-transparent" },
@@ -15,26 +17,7 @@ const ROOM_VIBES = [
 
 const getVibe = (id) => ROOM_VIBES[parseInt(id, 10) % ROOM_VIBES.length] || ROOM_VIBES[0];
 
-const INITIAL_ROOMS = [
-  { id: "1", name: "DSA Grinders", code: "DSA-420", isPrivate: false, members: [
-    { name: "Alex", status: "studying", avatar: "🧑‍💻" },
-    { name: "CodeWiz", status: "idle", avatar: "🧙" },
-    { name: "ByteMe", status: "studying", avatar: "🤖" },
-  ], maxMembers: 10, topic: "Binary Trees & Graphs", timer: "01:23:45" },
-  { id: "2", name: "System Design Gang", code: "SYS-069", isPrivate: true, members: [
-    { name: "Alex", status: "studying", avatar: "🧑‍💻" },
-    { name: "ArchMaster", status: "studying", avatar: "🏗️" },
-  ], maxMembers: 5, topic: "Load Balancers", timer: "00:45:12" },
-  { id: "3", name: "Frontend Wizards", code: "FRN-777", isPrivate: false, members: [
-    { name: "ReactFan", status: "studying", avatar: "⚛️" },
-    { name: "CSSKing", status: "idle", avatar: "🎨" },
-    { name: "TypeHero", status: "studying", avatar: "📘" },
-    { name: "NodeNinja", status: "studying", avatar: "🥷" },
-  ], maxMembers: 8, topic: "React Performance", timer: "02:10:33" },
-  { id: "4", name: "Late Night Coders", code: "LNC-042", isPrivate: false, members: [
-    { name: "NightOwl", status: "studying", avatar: "🦉" },
-  ], maxMembers: 6, topic: "LeetCode Dailies", timer: "00:15:08" },
-];
+// Using Real DB Instead of Initial Rooms
 
 const PulsingDot = ({ color = "bg-emerald-400", size = "w-2 h-2" }) => (
   <span className="relative flex">
@@ -127,7 +110,7 @@ const RoomCard = ({ room, vibe, onCopy, onDelete, onJoin, index }) => {
               className="p-2 rounded-xl text-muted-foreground/40 hover:text-foreground hover:bg-secondary/60 transition-all" title="Copy code">
               <Copy className="w-3.5 h-3.5" />
             </motion.button>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => onDelete(room.id)}
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => onDelete(room._id || room.id)}
               className="p-2 rounded-xl text-muted-foreground/20 hover:text-destructive hover:bg-destructive/5 opacity-0 group-hover:opacity-100 transition-all">
               <Trash2 className="w-3.5 h-3.5" />
             </motion.button>
@@ -203,25 +186,45 @@ const RoomCard = ({ room, vibe, onCopy, onDelete, onJoin, index }) => {
 };
 
 const StudyRooms = () => {
-  const [rooms, setRooms] = useState(INITIAL_ROOMS);
+  const [rooms, setRooms] = useState([]);
   const [newRoomName, setNewRoomName] = useState("");
   const [newTopic, setNewTopic] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const navigate = useNavigate();
 
-  const createRoom = () => {
+  useEffect(() => {
+    fetchRooms();
+  }, []);
+
+  const fetchRooms = async () => {
+    try {
+      const { data } = await axios.get("http://localhost:5000/api/rooms");
+      setRooms(data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load rooms");
+    }
+  };
+
+  const createRoom = async () => {
     if (!newRoomName.trim()) return;
-    const code = `${newRoomName.slice(0, 3).toUpperCase()}-${Math.floor(Math.random() * 999)}`;
-    setRooms([
-      { id: Date.now().toString(), name: newRoomName, code, isPrivate, members: [{ name: "You", status: "studying", avatar: "🧑‍💻" }], maxMembers: 10, topic: newTopic || null, timer: "00:00:00" },
-      ...rooms,
-    ]);
-    setNewRoomName("");
-    setNewTopic("");
-    setShowCreate(false);
-    toast.success("Room created!");
+    try {
+      const { data } = await axios.post("http://localhost:5000/api/rooms", {
+        name: newRoomName,
+        topic: newTopic,
+        isPrivate
+      });
+      setRooms([data, ...rooms]);
+      setNewRoomName("");
+      setNewTopic("");
+      setShowCreate(false);
+      toast.success("Room created!");
+    } catch (err) {
+      toast.error("Failed to create room");
+    }
   };
 
   const copyCode = (code) => {
@@ -229,8 +232,18 @@ const StudyRooms = () => {
     toast.success("Room code copied!");
   };
 
-  const joinRoom = (room) => toast.success(`Joined "${room.name}"!`);
-  const deleteRoom = (id) => setRooms(rooms.filter((r) => r.id !== id));
+  const joinRoom = (room) => {
+    navigate(`/rooms/${room._id}`);
+  };
+
+  const deleteRoom = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/rooms/${id}`);
+      setRooms(rooms.filter((r) => (r._id || r.id) !== id));
+    } catch (e) {
+      toast.error("Failed to delete room");
+    }
+  };
 
   const filteredRooms = rooms.filter((r) => {
     const matchSearch = r.name.toLowerCase().includes(search.toLowerCase()) || r.code.toLowerCase().includes(search.toLowerCase());
@@ -356,7 +369,7 @@ const StudyRooms = () => {
         <div className="space-y-3">
           <AnimatePresence mode="popLayout">
             {filteredRooms.map((room, idx) => (
-              <RoomCard key={room.id} room={room} vibe={getVibe(room.id)} onCopy={copyCode} onDelete={deleteRoom} onJoin={joinRoom} index={idx} />
+              <RoomCard key={room._id || room.id} room={room} vibe={getVibe(room._id || room.id)} onCopy={copyCode} onDelete={deleteRoom} onJoin={joinRoom} index={idx} />
             ))}
           </AnimatePresence>
         </div>

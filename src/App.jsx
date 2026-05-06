@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage";
 import StudyTimer from "./pages/StudyTimer";
 import TodoPage from "./pages/TodoPage";
 import StudyRooms from "./pages/StudyRooms";
+import StudyRoomSession from "./pages/StudyRoomSession";
 import SignInPage from "./pages/SignInPage";
 import NotFound from "./pages/NotFound";
 import RemindersPage from "./pages/RemindersPage";
@@ -27,6 +28,7 @@ const AnimatedRoutes = () => {
         <Route path="/timer" element={<StudyTimer />} />
         <Route path="/quests" element={<TodoPage />} />
         <Route path="/rooms" element={<StudyRooms />} />
+        <Route path="/rooms/:id" element={<StudyRoomSession />} />
         <Route path="/reminders" element={<RemindersPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="*" element={<NotFound />} />
@@ -37,18 +39,18 @@ const AnimatedRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AuthProvider>
           <Navbar />
           <div className="pb-20 md:pb-0">
             <AnimatedRoutes />
           </div>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 

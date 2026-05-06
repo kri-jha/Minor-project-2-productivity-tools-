@@ -83,7 +83,7 @@ const Navbar = () => {
                 <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
                   <User className="w-3.5 h-3.5 text-primary" />
                 </div>
-                <span className="hidden sm:inline font-medium">{profile?.name || "Profile"}</span>
+                <span className="hidden sm:inline font-medium">{profile?.full_name || profile?.username || "Profile"}</span>
               </Link>
               <button
                 onClick={signOut}

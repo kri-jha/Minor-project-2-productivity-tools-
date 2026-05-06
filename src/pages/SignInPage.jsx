@@ -1,59 +1,48 @@
-import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
-import { Sparkles, Mail, Lock, User, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import PageTransition from "@/components/PageTransition";
+import { useState } from "react";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { Sparkles, User, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 
 const SignInPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", username: "" });
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signIn, signUp } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.email.trim() || !form.password.trim()) {
-      toast({ title: "Please fill in all fields", variant: "destructive" });
+      toast.error("Please fill in all fields");
       return;
     }
     if (form.password.length < 6) {
-      toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+      toast.error("Password must be at least 6 characters");
       return;
     }
 
     setLoading(true);
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: form.email,
-          password: form.password,
-        });
-        if (error) throw error;
-        toast({ title: "Welcome back! 🎉" });
+        await signIn(form.email, form.password);
+        toast.success("Welcome back! 🎉");
         navigate("/profile");
       } else {
         if (!form.name.trim()) {
-          toast({ title: "Please enter your name", variant: "destructive" });
+          toast.error("Please enter your name");
           setLoading(false);
           return;
         }
-        const { error } = await supabase.auth.signUp({
-          email: form.email,
-          password: form.password,
-          options: {
-            data: { name: form.name },
-            emailRedirectTo: window.location.origin,
-          },
-        });
-        if (error) throw error;
-        toast({ title: "Account created! Check your email to confirm. ✉️" });
+        await signUp(form.email, form.password, form.name, form.username || form.name.split(' ')[0]);
+        toast.success("Account created successfully! 🎉");
+        navigate("/profile");
       }
     } catch (error) {
-      toast({ title: error.message, variant: "destructive" });
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
