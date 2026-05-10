@@ -1,4 +1,4 @@
-# Gamified Productivity Tool 🚀
+# Gamified Productivity Tool 💻
 
 Gamified Productivity Tool is a comprehensive, modern productivity and study application designed to help students and professionals focus, collaborate, and manage their time effectively.
 
